@@ -31,6 +31,9 @@ var fly = false
 var flying = false
 var limit_collision = false
 var limit_collision_start = 0
+var punch = false
+var punching = false
+var move = true
 
 
 func _physics_process(delta):
@@ -44,6 +47,11 @@ func _physics_process(delta):
 			restore_collision()
 		$Animation.update()
 		fly = false
+	elif punch:
+		if not punching:
+			punching = true
+			$Animation.update()
+		punch = false
 	elif flying:
 		pass
 	elif on_floor:
@@ -89,10 +97,16 @@ func _physics_process(delta):
 		if cancel_jump:
 			if flying:
 				velocity.y = 0
-				jump = false
 			elif velocity.y < 0:
 				velocity.y /= 2
+			jump = false
 			cancel_jump = false
+	if move and not punching:
+		$Animation.update()
+#		if (direction > 0 and velocity.x < 0
+#			or direction < 0 and velocity.x > 0):
+#			$Animation.update()
+#			print("update")
 	var remaining_velocity_x = velocity.x * inertia
 	var move_velocity_x = (direction * move_speed
 							* run_speed * scale.x * (1 - inertia))
@@ -101,6 +115,41 @@ func _physics_process(delta):
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
 	set_collision_mask_bit(2, not move_down)
 	move(delta)
+
+
+func _input(event):
+	if event.is_action_pressed("move_right"):
+		action_move_right()
+	if event.is_action_released("move_right"):
+		action_stop_moving_right()
+	if event.is_action_pressed("move_left"):
+		action_move_left()
+	if event.is_action_released("move_left"):
+		action_stop_moving_left()
+	if event.is_action_pressed("jump"):
+		action_jump()
+	if event.is_action_released("jump"):
+		action_cancel_jump()
+	if event.is_action_pressed("move_down"):
+		action_move_down()
+	if event.is_action_released("move_down"):
+		action_stop_moving_down()
+	if event.is_action_pressed("action"):
+		action_do_action()
+
+
+func _notification(what):
+	match what:
+		NOTIFICATION_WM_FOCUS_OUT:
+			if move_speed > 0:
+				if direction > 0:
+					action_stop_moving_right()
+				else:
+					action_stop_moving_left()
+			if jump:
+				action_cancel_jump()
+			if move_down:
+				action_stop_moving_down()
 
 
 func move(delta):
@@ -166,39 +215,6 @@ func move_and_collide_ex(vel):
 	return collision
 
 
-func _input(event):
-	if event.is_action_pressed("move_right"):
-		action_move_right()
-	if event.is_action_released("move_right"):
-		action_stop_moving_right()
-	if event.is_action_pressed("move_left"):
-		action_move_left()
-	if event.is_action_released("move_left"):
-		action_stop_moving_left()
-	if event.is_action_pressed("jump"):
-		action_jump()
-	if event.is_action_released("jump"):
-		action_cancel_jump()
-	if event.is_action_pressed("move_down"):
-		action_move_down()
-	if event.is_action_released("move_down"):
-		action_stop_moving_down()
-
-
-func _notification(what):
-	match what:
-		NOTIFICATION_WM_FOCUS_OUT:
-			if move_speed > 0:
-				if direction > 0:
-					action_stop_moving_right()
-				else:
-					action_stop_moving_left()
-			if jump:
-				action_cancel_jump()
-			if move_down:
-				action_stop_moving_down()
-
-
 func restore_collision():
 	for owner_id in get_shape_owners():
 		var shape_owner = shape_owner_get_owner(owner_id)
@@ -208,9 +224,11 @@ func restore_collision():
 
 
 func action_move_right():
+	if direction < 0:
+		punching = false
 	direction = 1
 	move_speed = 1
-	$Animation.update()
+	move = true
 
 
 func action_stop_moving_right():
@@ -218,10 +236,13 @@ func action_stop_moving_right():
 		move_speed = 0
 		$Animation.update()
 
+
 func action_move_left():
+	if direction > 0:
+		punching = false
 	direction = -1
 	move_speed = 1
-	$Animation.update()
+	move = true
 
 
 func action_stop_moving_left():
@@ -259,6 +280,10 @@ func action_move_down():
 
 func action_stop_moving_down():
 	move_down = false
+
+
+func action_do_action():
+	punch = true
 
 
 func stop():

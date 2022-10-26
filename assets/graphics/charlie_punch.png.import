@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/charlie_punch_l.png-195fd35df250f1da3dd116148efe5456.stex"
+path="res://.import/charlie_punch.png-b1cd473579206e9abaad70f7ea6ed160.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/graphics/charlie_punch_l.png"
-dest_files=[ "res://.import/charlie_punch_l.png-195fd35df250f1da3dd116148efe5456.stex" ]
+source_file="res://assets/graphics/charlie_punch.png"
+dest_files=[ "res://.import/charlie_punch.png-b1cd473579206e9abaad70f7ea6ed160.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=true
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2
