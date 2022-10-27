@@ -11,7 +11,7 @@ export var jump_speed = 510
 export var max_speed = 700
 export var max_jumps = 1
 export var dash_multiplier = 5
-export var dash_time = 250
+export var dash_time = 200
 export var dash_cooldown = 500
 
 
