@@ -43,7 +43,7 @@ func _on_item_body_entered(body: KinematicBody2D, item: Node2D, item_id: int):
 func reset():
 	coins = 0
 	orbs = 0
-	character.stop()
+	character.reset()
 	character.position = start_position
 	character.face_right()
 	character.flying = false
@@ -65,9 +65,9 @@ func reset():
 			var item_pos = cell_global_pos + $ItemMap.cell_size / 2
 			add_item(tile_id, item_pos)
 	for moving in $Moving.get_children():
-		var player = moving.get_node("AnimationPlayer") as AnimationPlayer
-		player.stop()
-		player.play("move")
+		var object = moving.get_node("AnimationPlayer") as AnimationPlayer
+		object.stop()
+		object.play("move")
 	update_hud()
 
 
