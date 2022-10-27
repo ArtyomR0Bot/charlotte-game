@@ -1,49 +1,31 @@
 extends Node2D
 
 
-enum State {FALLING, IDLE, RUNNING, JUMPING, FLYING}
-
-
-var last_state = State.FALLING
-var state
-
-
 onready var character = get_parent()
+onready var last_state = character.state
 
 
-func update():
+func change():
 	var dir_str = "_l" if character.direction < 0 else "_r"
-	if character.flying:
-		state = State.FLYING
-	elif character.jumping:
-		state = State.JUMPING
-	elif character.falling:
-		state = State.FALLING
-	elif character.move_speed > 0:
-		state = State.RUNNING
-	else:
-		state = State.IDLE
-	match last_state:
-		State.FLYING:
-			if state != last_state:
-				$AnimationPlayer.play("RESET")
-
-
-	match state:
-		State.FLYING:
-			$AnimationPlayer.play("fly" + dir_str)
-		State.JUMPING:
-			if character.jump:
-				set_animation($Body, "jump", dir_str, false, true)
-			else:
-				set_animation($Body, "jump", dir_str, true)
-		State.FALLING:
+	match character.state:
+		character.FALLING:
 			set_animation($Body, "fall", dir_str, true)
-		State.RUNNING:
-			set_animation($Body, "run", dir_str)
-		State.IDLE:
+			if last_state == character.FLYING:
+				$AnimationPlayer.play("RESET")
+		character.IDLE:
 			set_animation($Body, "idle", dir_str)
-	last_state = state
+		character.RUNNING:
+			set_animation($Body, "run", dir_str)
+		character.JUMPING:
+			var keep_frame = character.state == last_state
+			set_animation($Body, "jump", dir_str, keep_frame)
+		character.FLYING:
+			var keep_frame = character.state == last_state
+			set_animation($Body, "fly", dir_str, keep_frame)
+			$Wings.offset.x = 4 if character.direction < 0 else 0
+			if not keep_frame:
+				$AnimationPlayer.play("fly")
+	last_state = character.state
 
 
 func set_animation(sprite, name, dir_str, keep_frame = false, restart = false):

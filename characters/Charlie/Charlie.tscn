@@ -1,4 +1,4 @@
-[gd_scene load_steps=73 format=2]
+[gd_scene load_steps=72 format=2]
 
 [ext_resource path="res://assets/graphics/charlie_run_l.png" type="Texture" id=1]
 [ext_resource path="res://assets/graphics/charlie_run_r.png" type="Texture" id=2]
@@ -261,12 +261,12 @@ animations = [ {
 "frames": [ SubResource( 116 ), SubResource( 117 ) ],
 "loop": true,
 "name": "fly_l",
-"speed": 5.0
+"speed": 3.0
 }, {
 "frames": [ SubResource( 118 ), SubResource( 119 ) ],
 "loop": true,
 "name": "fly_r",
-"speed": 5.0
+"speed": 3.0
 }, {
 "frames": [ SubResource( 77 ), SubResource( 78 ), SubResource( 79 ), SubResource( 80 ), SubResource( 81 ), SubResource( 82 ), SubResource( 83 ), SubResource( 84 ) ],
 "loop": true,
@@ -336,56 +336,20 @@ tracks/1/keys = {
 "values": [ 0 ]
 }
 tracks/2/type = "value"
-tracks/2/path = NodePath("Body:animation")
+tracks/2/path = NodePath("Wings:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
-tracks/2/enabled = false
+tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ "fall_r" ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("Body:frame")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ 0 ]
-}
-tracks/4/type = "value"
-tracks/4/path = NodePath("Wings:visible")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
 "values": [ false ]
 }
-tracks/5/type = "value"
-tracks/5/path = NodePath("Wings:offset")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 0, 0 ) ]
-}
 
 [sub_resource type="Animation" id=132]
-resource_name = "fly_l"
+resource_name = "fly"
 length = 0.51
 loop = true
 step = 0.02
@@ -414,7 +378,7 @@ tracks/1/keys = {
 "values": [ 2, 1, 0 ]
 }
 tracks/2/type = "value"
-tracks/2/path = NodePath("Body:animation")
+tracks/2/path = NodePath("Wings:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
@@ -423,121 +387,7 @@ tracks/2/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 1,
-"values": [ "fly_l" ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("Body:frame")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0, 0.24 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ 0, 1 ]
-}
-tracks/4/type = "value"
-tracks/4/path = NodePath("Wings:visible")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
 "values": [ true ]
-}
-tracks/5/type = "value"
-tracks/5/path = NodePath("Wings:offset")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 4, 0 ) ]
-}
-
-[sub_resource type="Animation" id=76]
-resource_name = "fly_r"
-length = 0.51
-loop = true
-step = 0.02
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 0.2 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector2( 0, -0.5 ), Vector2( 0, 0.5 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Wings:frame")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.17, 0.34 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 1,
-"values": [ 2, 1, 0 ]
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath("Body:animation")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "fly_r" ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("Body:frame")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0, 0.24 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ 0, 1 ]
-}
-tracks/4/type = "value"
-tracks/4/path = NodePath("Wings:visible")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-tracks/5/type = "value"
-tracks/5/path = NodePath("Wings:offset")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 0, 0 ) ]
 }
 
 [node name="Charlie" type="KinematicBody2D"]
@@ -562,17 +412,17 @@ script = ExtResource( 8 )
 
 [node name="Wings" type="AnimatedSprite" parent="Animation"]
 visible = false
-position = Vector2( 0, -20.235 )
 scale = Vector2( 0.5, 0.5 )
 frames = SubResource( 73 )
+offset = Vector2( 0, -40.23 )
 
 [node name="Body" type="AnimatedSprite" parent="Animation"]
 position = Vector2( 0, -13.995 )
 frames = SubResource( 93 )
 animation = "fall_r"
+frame = 1
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]
 anims/RESET = SubResource( 75 )
-anims/fly_l = SubResource( 132 )
-anims/fly_r = SubResource( 76 )
+anims/fly = SubResource( 132 )
