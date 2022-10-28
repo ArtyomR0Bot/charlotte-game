@@ -46,7 +46,6 @@ func reset():
 	character.reset()
 	character.position = start_position
 	character.face_right()
-	character.flying = false
 	for child in $TileMap.get_children():
 		$TileMap.remove_child(child)
 		child.queue_free()
