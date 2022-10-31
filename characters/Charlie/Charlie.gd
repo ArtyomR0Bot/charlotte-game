@@ -66,7 +66,7 @@ func _physics_process(delta):
 					if (num_jumps == 0
 							and OS.get_ticks_msec() - in_air_start > 0):
 						num_jumps = 1
-					if (state != JUMPING
+					if (state != FALLING and state != JUMPING
 							and OS.get_ticks_msec() - in_air_start > 200):
 						state = FALLING
 						$Animation.change()
