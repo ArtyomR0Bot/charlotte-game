@@ -11,13 +11,12 @@ export var jump_speed = 510
 export var max_speed = 700
 export var max_jumps = 1
 export var dash_multiplier = 5
-export var dash_time = 200
+export var dash_time = 150
 export var dash_cooldown = 500
 
 
 var dash_end = 0
 var dash_start = 0
-#var dashing = false
 var direction = 1
 var in_air = true
 var in_air_start = 0
@@ -51,7 +50,10 @@ func _physics_process(delta):
 			num_jumps = 0
 			if limit_collision:
 				restore_collision()
-			if state == FALLING or state == JUMPING and not jump_start:
+			if jump_start:
+				state = JUMPING
+				$Animation.change()
+			elif state == FALLING or state == JUMPING:
 				if move_speed == 0:
 					state = IDLE
 				else:
@@ -252,8 +254,6 @@ func action_jump():
 			num_jumps += 1
 			velocity.y = -jump_speed * scale.y
 			jump_start = true
-			state = JUMPING
-			$Animation.change()
 	last_input = JUMP
 	last_input_time = OS.get_ticks_msec()
 

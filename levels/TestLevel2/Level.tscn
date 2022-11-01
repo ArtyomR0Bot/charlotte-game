@@ -88,11 +88,6 @@ tile_data = PoolIntArray( -2621428, 1, 65537, -2621427, 1, 65537, -2621426, 1, 6
 position = Vector2( 191, 238 )
 max_jumps = 2
 
-[node name="Camera2D" type="Camera2D" parent="Sharik"]
-visible = false
-current = true
-zoom = Vector2( 0.5, 0.5 )
-
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 16, 16 )
