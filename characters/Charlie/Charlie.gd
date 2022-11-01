@@ -2,7 +2,7 @@ extends KinematicBody2D
 
 
 enum {NONE, MOVE_RIGHT, MOVE_LEFT, JUMP, MOVE_DOWN}
-enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING}
+enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING, AFTER_DASH}
 
 
 export var gravity = 25
@@ -10,7 +10,7 @@ export var run_speed = 150
 export var jump_speed = 510
 export var max_speed = 700
 export var max_jumps = 1
-export var dash_multiplier = 5
+export var dash_multiplier = 4
 export var dash_time = 150
 export var dash_cooldown = 500
 
@@ -38,6 +38,8 @@ var velocity: Vector2
 
 
 func _physics_process(delta):
+	if $FloorArea.shift:
+		position += $FloorArea.shift
 	var inertia = 0.8
 	if state == FLYING:
 		if move_up:
@@ -53,7 +55,7 @@ func _physics_process(delta):
 			if jump_start:
 				state = JUMPING
 				$Animation.change()
-			elif state == FALLING or state == JUMPING:
+			elif state != IDLE and state != RUNNING and state != DASHING:
 				if move_speed == 0:
 					state = IDLE
 				else:
@@ -80,9 +82,10 @@ func _physics_process(delta):
 		else:
 			velocity.y += gravity
 	if state == DASHING:
-		inertia = 0.5
 		if OS.get_ticks_msec() - dash_start > dash_time:
 			action_stop_dash()
+		else:
+			inertia = 0.5
 	var remaining_velocity_x = velocity.x * inertia
 	var move_velocity_x = (direction * move_speed
 							* run_speed * scale.x * (1 - inertia))
@@ -90,6 +93,7 @@ func _physics_process(delta):
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
 	set_collision_mask_bit(2, not move_down)
+	$FloorArea.set_collision_mask_bit(2, not move_down)
 	move_body(delta)
 
 
@@ -296,7 +300,7 @@ func action_stop_dash():
 		if state_mem == FLYING:
 			state = FLYING
 		else:
-			state = state_mem
+			state = AFTER_DASH
 		dash_end = OS.get_ticks_msec()
 		if move_speed > 1:
 			move_speed = 1 if running else 0

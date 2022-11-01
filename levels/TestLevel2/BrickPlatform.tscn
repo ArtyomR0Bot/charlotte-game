@@ -10,6 +10,8 @@ region = Rect2( 16, 16, 48, 16 )
 extents = Vector2( 24, 8 )
 
 [node name="BrickPlatform" type="StaticBody2D"]
+collision_layer = 2
+collision_mask = 0
 __meta__ = {
 "_edit_group_": true
 }

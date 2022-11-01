@@ -41,6 +41,9 @@ func change():
 		character.DASHING:
 			if DEBUG:
 				print("DASHING")
+		character.AFTER_DASH:
+			if DEBUG:
+				print("AFTER_DASH")
 	last_state = character.state
 
 

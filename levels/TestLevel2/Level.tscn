@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://characters/Charlie/Charlie.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/graphics/Dungeon Tile Set.tres" type="TileSet" id=2]
@@ -72,6 +72,39 @@ tracks/0/keys = {
 "values": [ Vector2( 440, 248 ), Vector2( 440, 248 ), Vector2( 440, 8 ), Vector2( 440, 8 ) ]
 }
 
+[sub_resource type="Animation" id=4]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 104, 184 ) ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "move"
+length = 14.0
+loop = true
+step = 1.0
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1, 7, 8, 14 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 104, 184 ), Vector2( 104, 184 ), Vector2( 280, 184 ), Vector2( 280, 184 ), Vector2( 104, 184 ) ]
+}
+
 [node name="Level" type="Node2D"]
 script = ExtResource( 5 )
 
@@ -128,6 +161,13 @@ position = Vector2( 440, 248 )
 playback_process_mode = 0
 anims/RESET = SubResource( 3 )
 anims/move = SubResource( 2 )
+
+[node name="BrickPlatform2" parent="Moving" instance=ExtResource( 8 )]
+position = Vector2( 104, 184 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Moving/BrickPlatform2"]
+anims/RESET = SubResource( 4 )
+anims/move = SubResource( 5 )
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
