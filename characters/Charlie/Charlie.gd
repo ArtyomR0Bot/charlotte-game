@@ -176,7 +176,7 @@ func move_body(delta):
 	if num_wall_collisions > 1 and state != FLYING:
 		for owner_id in get_shape_owners():
 			var shape_owner = shape_owner_get_owner(owner_id)
-			if shape_owner.one_way_collision:
+			if shape_owner.z_index < 0:
 				shape_owner.disabled = true
 		limit_collision = true
 
@@ -185,7 +185,7 @@ func move_and_collide_ex(vel):
 	var collision = move_and_collide(vel)
 	if not collision:
 		return
-	if collision.local_shape.one_way_collision:
+	if collision.local_shape.z_index < 0:
 		if collision.collider.get_collision_layer_bit(2):
 			position += collision.remainder
 			return
@@ -195,7 +195,7 @@ func move_and_collide_ex(vel):
 func restore_collision():
 	for owner_id in get_shape_owners():
 		var shape_owner = shape_owner_get_owner(owner_id)
-		if shape_owner.one_way_collision:
+		if shape_owner.z_index < 0:
 			shape_owner.disabled = false
 	limit_collision = false
 
