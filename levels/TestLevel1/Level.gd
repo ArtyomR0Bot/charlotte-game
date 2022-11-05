@@ -61,7 +61,6 @@ func add_item(item_id: int, pos: Vector2):
 func reset():
 	coins = 0
 	orbs = 0
-	character.stop()
 	character.position = start_position
 	character.face_right()
 	for child in $Items.get_children():
