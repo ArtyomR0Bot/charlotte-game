@@ -17,7 +17,7 @@ export var dash_cooldown = 500
 
 var dash_end = 0
 var dash_start = 0
-var direction = 1
+var direction = Vector2.ZERO
 var in_air = true
 var in_air_start = 0
 var jump_start
@@ -132,6 +132,25 @@ func _notification(what):
 				action_cancel_jump()
 			if move_down:
 				action_stop_moving_down()
+
+
+func get_input():
+	if Input.is_action_pressed("move_right"):
+		action_move_right()
+	if Input.is_action_pressed("move_left"):
+		action_move_left()
+	if Input.is_action_released("move_left"):
+		action_stop_moving_left()
+	if Input.is_action_just_pressed("jump"):
+		action_jump()
+	if Input.is_action_pressed("move_down"):
+		action_move_down()
+	if Input.is_action_released("move_down"):
+		action_stop_moving_down()
+	if Input.is_action_pressed("dash"):
+		action_dash()
+	if Input.is_action_released("dash"):
+		action_stop_dash()
 
 
 func move_body(delta):

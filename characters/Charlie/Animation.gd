@@ -9,6 +9,7 @@ onready var last_state = character.state
 
 
 func change():
+	return
 	var dir_str = "_l" if character.direction < 0 else "_r"
 	match character.state:
 		character.FALLING:
