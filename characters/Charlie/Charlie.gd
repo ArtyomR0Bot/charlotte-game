@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 
-enum {NONE, MOVE_RIGHT, MOVE_LEFT, JUMP, MOVE_DOWN}
+enum {NONE, MOVE_RIGHT, MOVE_LEFT, STOP_MOVING, JUMP, MOVE_DOWN}
 enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING, AFTER_DASH}
 
 
@@ -10,14 +10,23 @@ export var run_speed = 150
 export var jump_speed = 510
 export var max_speed = 700
 export var max_jumps = 1
-export var dash_multiplier = 4
-export var dash_time = 150
+export var dash_multiplier = 2
+export var dash_time = 200
 export var dash_cooldown = 500
 
 
+# control
+var direction = Vector2.ZERO
+var a_button = false
+
+# inner state
+var last_direction = Vector2.ZERO
+var a_button_pressed = false
+var face_right = true
+var action = NONE
+
 var dash_end = 0
 var dash_start = 0
-var direction = Vector2.ZERO
 var in_air = true
 var in_air_start = 0
 var jump_start
@@ -38,14 +47,17 @@ var velocity: Vector2
 
 
 func _physics_process(delta):
+	get_input()
+	get_action()
 	if $FloorArea.shift:
 		position += $FloorArea.shift
 	var inertia = 0.8
 	if state == FLYING:
-		if move_up:
-			velocity.y = -run_speed * scale.y
-		elif move_down:
-			velocity.y = run_speed * scale.y
+		pass
+#		if move_up:
+#			velocity.y = -run_speed * scale.y
+#		elif move_down:
+#			velocity.y = run_speed * scale.y
 	else:
 		if on_floor:
 			in_air = false
@@ -55,14 +67,13 @@ func _physics_process(delta):
 			if jump_start:
 				state = JUMPING
 				$Animation.change()
-			elif state != IDLE and state != RUNNING and state != DASHING:
+				jump_start = false
+			elif state == JUMPING or state == FALLING:
 				if move_speed == 0:
 					state = IDLE
 				else:
 					state = RUNNING
 				$Animation.change()
-			if jump_start:
-				jump_start = false
 		else:
 			if state != DASHING:
 				inertia = 0.95
@@ -87,8 +98,8 @@ func _physics_process(delta):
 		else:
 			inertia = 0.5
 	var remaining_velocity_x = velocity.x * inertia
-	var move_velocity_x = (direction * move_speed
-							* run_speed * scale.x * (1 - inertia))
+	var move_velocity_x = direction.x * move_speed * run_speed * (1 - inertia)
+	
 	velocity.x = remaining_velocity_x + move_velocity_x
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
@@ -98,6 +109,7 @@ func _physics_process(delta):
 
 
 func _input(event):
+	return
 	if event.is_action_pressed("move_right"):
 		action_move_right()
 	if event.is_action_released("move_right"):
@@ -135,22 +147,41 @@ func _notification(what):
 
 
 func get_input():
+	direction = Vector2.ZERO
 	if Input.is_action_pressed("move_right"):
-		action_move_right()
-	if Input.is_action_pressed("move_left"):
-		action_move_left()
-	if Input.is_action_released("move_left"):
-		action_stop_moving_left()
-	if Input.is_action_just_pressed("jump"):
-		action_jump()
-	if Input.is_action_pressed("move_down"):
-		action_move_down()
-	if Input.is_action_released("move_down"):
-		action_stop_moving_down()
+		direction.x = 1
+	elif Input.is_action_pressed("move_left"):
+		direction.x = -1
+	if Input.is_action_pressed("jump"):
+		direction.y = -1
+	elif Input.is_action_pressed("move_down"):
+		direction.y = 1
 	if Input.is_action_pressed("dash"):
-		action_dash()
-	if Input.is_action_released("dash"):
-		action_stop_dash()
+		a_button = true
+	print(direction)
+
+
+func get_action():
+	action = NONE
+	if direction.x >= 0.5:
+		if last_direction.x < 0.5:
+			face_right = true
+			action = MOVE_RIGHT
+	elif direction.x <= -0.5:
+		if last_direction.x > -0.5:
+			face_right = false
+			action = MOVE_LEFT
+	elif last_direction.x <= -0.5 or last_direction.x >= -0.5:
+		action = STOP_MOVING
+	last_direction = direction
+
+
+func do_action():
+	if action != NONE:
+		print(action)
+	match state:
+		FALLING:
+			pass
 
 
 func move_body(delta):
@@ -348,8 +379,8 @@ func reset():
 
 
 func face_right():
-	direction = 1
+	face_right = true
 
 
 func face_left():
-	direction = -1
+	face_right = false

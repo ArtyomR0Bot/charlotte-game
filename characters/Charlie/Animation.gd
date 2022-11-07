@@ -1,7 +1,7 @@
 extends Node2D
 
 
-const DEBUG = false
+const DEBUG = true
 
 
 onready var character = get_parent()
@@ -9,8 +9,7 @@ onready var last_state = character.state
 
 
 func change():
-	return
-	var dir_str = "_l" if character.direction < 0 else "_r"
+	var dir_str = "_r" if character.face_right else "_l"
 	match character.state:
 		character.FALLING:
 			if DEBUG:
