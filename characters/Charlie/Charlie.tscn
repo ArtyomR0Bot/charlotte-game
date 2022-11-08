@@ -1,4 +1,4 @@
-[gd_scene load_steps=74 format=2]
+[gd_scene load_steps=72 format=2]
 
 [ext_resource path="res://common/graphics/charlie_run_l.png" type="Texture" id=1]
 [ext_resource path="res://common/graphics/charlie_run_r.png" type="Texture" id=2]
@@ -10,10 +10,9 @@
 [ext_resource path="res://characters/Charlie/Animation.gd" type="Script" id=8]
 [ext_resource path="res://characters/Charlie/Charlie.gd" type="Script" id=9]
 [ext_resource path="res://common/graphics/charlie_punch.png" type="Texture" id=10]
-[ext_resource path="res://characters/Charlie/FloorArea.gd" type="Script" id=11]
 
 [sub_resource type="RectangleShape2D" id=44]
-extents = Vector2( 4, 12.746 )
+extents = Vector2( 4, 12.887 )
 
 [sub_resource type="AtlasTexture" id=69]
 flags = 13
@@ -447,9 +446,6 @@ tracks/2/keys = {
 "values": [ true ]
 }
 
-[sub_resource type="RectangleShape2D" id=133]
-extents = Vector2( 4, 1 )
-
 [node name="Charlie" type="KinematicBody2D"]
 collision_mask = 14
 script = ExtResource( 9 )
@@ -459,7 +455,6 @@ __meta__ = {
 dash_multiplier = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2( 0, -12.937 )
 shape = SubResource( 44 )
 
@@ -481,23 +476,11 @@ offset = Vector2( 0, -37.209 )
 position = Vector2( 0, -13.995 )
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 93 )
-animation = "fall_r"
-frame = 1
+animation = "idle_r"
+frame = 2
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]
 playback_process_mode = 0
 anims/RESET = SubResource( 75 )
 anims/fly = SubResource( 132 )
-
-[node name="FloorArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 6
-script = ExtResource( 11 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FloorArea"]
-position = Vector2( 0, 1 )
-shape = SubResource( 133 )
-
-[connection signal="body_entered" from="FloorArea" to="FloorArea" method="_on_FloorArea_body_entered"]
-[connection signal="body_exited" from="FloorArea" to="FloorArea" method="_on_FloorArea_body_exited"]

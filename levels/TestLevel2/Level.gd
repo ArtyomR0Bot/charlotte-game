@@ -53,16 +53,16 @@ func reset():
 		var tile_id = $FragileMap.get_cellv(cell_pos)
 		if tile_id != TileMap.INVALID_CELL:
 			var cell_local_pos = $FragileMap.map_to_world(cell_pos)
-			var cell_global_pos = $FragileMap.to_global(cell_local_pos)
-			var item_pos = cell_global_pos + $FragileMap.cell_size / 2
-			add_fragile_bricks(tile_id, item_pos)
+			var item_local_pos = cell_local_pos + $FragileMap.cell_size / 2
+			var item_global_pos = $FragileMap.to_global(item_local_pos)
+			add_fragile_bricks(tile_id, item_global_pos)
 	for cell_pos in $ItemMap.get_used_cells():
 		var tile_id = $ItemMap.get_cellv(cell_pos)
 		if tile_id != TileMap.INVALID_CELL:
 			var cell_local_pos = $ItemMap.map_to_world(cell_pos)
-			var cell_global_pos = $ItemMap.to_global(cell_local_pos)
-			var item_pos = cell_global_pos + $ItemMap.cell_size / 2
-			add_item(tile_id, item_pos)
+			var item_local_pos = cell_local_pos + $ItemMap.cell_size / 2
+			var item_global_pos = $ItemMap.to_global(item_local_pos)
+			add_item(tile_id, item_global_pos)
 	for moving in $Moving.get_children():
 		var object = moving.get_node("AnimationPlayer") as AnimationPlayer
 		object.stop()
@@ -74,8 +74,8 @@ func add_fragile_bricks(item_id: int, pos: Vector2):
 	match item_id:
 		brick_id:
 			var brick = FragileBrick.instance()
-			brick.position = $TileMap.to_local(pos)
 			$TileMap.add_child(brick)
+			brick.position = $TileMap.to_local(pos)
 
 
 func add_item(item_id: int, pos: Vector2):
@@ -91,8 +91,8 @@ func add_item(item_id: int, pos: Vector2):
 			var item_area = item.get_node("Area2D")
 			item_area.connect("body_entered", self,
 								"_on_item_body_entered", [item, item_id])
-			item.position = $TileMap.to_local(pos)
 			$TileMap.add_child(item)
+			item.position = $TileMap.to_local(pos)
 
 
 func update_hud():

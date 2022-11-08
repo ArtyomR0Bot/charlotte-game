@@ -43,12 +43,11 @@ var on_wall = false
 var limit_collision = false
 var last_action = NONE
 var last_action_time = 0
+var snap_pos: Vector2
 
 
 func _physics_process(delta):
 	do_actions(get_input_actions())
-	if $FloorArea.shift:
-		position += $FloorArea.shift
 	var inertia = 0.8
 	if state == FLYING:
 		velocity.y = move_speed.y * run_speed
@@ -95,7 +94,6 @@ func _physics_process(delta):
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
 	set_collision_mask_bit(2, move_speed.y <= 0)
-	$FloorArea.set_collision_mask_bit(2, move_speed.y <= 0)
 	move_body(delta)
 
 
@@ -262,6 +260,12 @@ func move_body(delta):
 			collision = move_and_collide_ex(move_vec)
 		else:
 			on_floor = true
+			if collision.collider is KinematicBody2D:
+				var body: KinematicBody2D = collision.collider
+				if body["motion/sync_to_physics"]:
+					if snap_pos:
+						position += body.position - snap_pos - collision.travel
+					snap_pos = body.position
 			velocity.y = 0
 			var remainder = collision.remainder
 			var normal = collision.normal
@@ -274,6 +278,8 @@ func move_body(delta):
 			on_wall = false
 		if on_ceiling:
 			on_ceiling = false
+	else:
+		snap_pos = Vector2.ZERO
 	if num_wall_collisions > 1 and state != FLYING:
 		for owner_id in get_shape_owners():
 			var shape_owner = shape_owner_get_owner(owner_id)

@@ -4,19 +4,20 @@
 
 [sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 1 )
-region = Rect2( 16, 16, 48, 16 )
+region = Rect2( 64, 64, 192, 64 )
 
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 24, 8 )
 
-[node name="BrickPlatform" type="StaticBody2D"]
+[node name="BrickPlatform" type="KinematicBody2D"]
 collision_layer = 2
-collision_mask = 0
+motion/sync_to_physics = true
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Sprite" type="Sprite" parent="."]
+scale = Vector2( 0.25, 0.25 )
 texture = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -83,6 +83,7 @@ animations = [ {
 radius = 3.33
 
 [node name="Coin" type="Node2D"]
+scale = Vector2( 4, 4 )
 script = SubResource( 9 )
 __meta__ = {
 "_edit_group_": true
@@ -90,7 +91,7 @@ __meta__ = {
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 7 )
-frame = 5
+frame = 3
 playing = true
 
 [node name="Area2D" type="Area2D" parent="."]
