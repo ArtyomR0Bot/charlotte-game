@@ -6,7 +6,7 @@ enum {NONE, MOVE_RIGHT, MOVE_LEFT, MOVE_SIDEWAY, STOP_MOVING,
 		MOVE_UP, STOP_MOVING_UP, MOVE_DOWN, STOP_MOVING_DOWN,
 		FLY, STOP_FLYING, ACTION_A, STOP_ACTION_A, DASH, STOP_DASHING}
 # states
-enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING, AFTER_DASH}
+enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING}
 
 
 export var max_speed = 700
@@ -24,7 +24,7 @@ var button_a = false
 
 # inner state
 var state = FALLING
-var state_stack = []
+var last_state = state
 var last_direction = Vector2.ZERO
 var last_button_a = false
 var face_right = true
@@ -218,15 +218,16 @@ func do_action(action):
 				do_action(STOP_DASHING)
 		DASH:
 			if OS.get_ticks_msec() - dash_end > dash_cooldown:
-				state_stack.push_back(state)
+				last_state = state
 				state = DASHING
 				move_speed.x *= dash_multiplier
 				dash_start = OS.get_ticks_msec()
 				$Animation.change()
 		STOP_DASHING:
-			state = state_stack.pop_back()
+			state = last_state
 			move_speed.x = 1 * sign(move_speed.x)
 			dash_end = OS.get_ticks_msec()
+			$Animation.change()
 
 
 func move_body(delta):

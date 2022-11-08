@@ -35,15 +35,12 @@ func change():
 				print("FLYING")
 			var keep_frame = character.state == last_state
 			set_animation($Body, "fly", dir_str, keep_frame)
-			$Wings.offset.x = 4 if character.direction.x < 0 else 0
+			$Wings.offset.x = 0 if character.face_right else 4
 			if not keep_frame:
 				$AnimationPlayer.play("fly")
 		character.DASHING:
 			if DEBUG:
 				print("DASHING")
-		character.AFTER_DASH:
-			if DEBUG:
-				print("AFTER_DASH")
 	last_state = character.state
 
 
