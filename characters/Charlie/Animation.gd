@@ -1,7 +1,7 @@
 extends Node2D
 
 
-const DEBUG = true
+const DEBUG = false
 
 
 onready var character = get_parent()
@@ -35,7 +35,7 @@ func change():
 				print("FLYING")
 			var keep_frame = character.state == last_state
 			set_animation($Body, "fly", dir_str, keep_frame)
-			$Wings.offset.x = 4 if character.direction < 0 else 0
+			$Wings.offset.x = 4 if character.direction.x < 0 else 0
 			if not keep_frame:
 				$AnimationPlayer.play("fly")
 		character.DASHING:

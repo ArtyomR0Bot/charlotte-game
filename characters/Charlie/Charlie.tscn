@@ -16,18 +16,22 @@
 extents = Vector2( 4, 12.746 )
 
 [sub_resource type="AtlasTexture" id=69]
+flags = 13
 atlas = ExtResource( 7 )
 region = Rect2( 0, 0, 144, 144 )
 
 [sub_resource type="AtlasTexture" id=70]
+flags = 13
 atlas = ExtResource( 7 )
 region = Rect2( 144, 0, 144, 144 )
 
 [sub_resource type="AtlasTexture" id=71]
+flags = 13
 atlas = ExtResource( 7 )
 region = Rect2( 288, 0, 144, 144 )
 
 [sub_resource type="AtlasTexture" id=72]
+flags = 13
 atlas = ExtResource( 7 )
 region = Rect2( 432, 0, 144, 144 )
 
@@ -39,15 +43,15 @@ animations = [ {
 "speed": 8.0
 } ]
 
-[sub_resource type="AtlasTexture" id=134]
+[sub_resource type="AtlasTexture" id=186]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 1088, 0, 272, 272 )
+region = Rect2( 544, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=135]
+[sub_resource type="AtlasTexture" id=187]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 1360, 0, 272, 272 )
+region = Rect2( 680, 0, 136, 136 )
 
 [sub_resource type="AtlasTexture" id=136]
 flags = 13
@@ -59,15 +63,15 @@ flags = 13
 atlas = ExtResource( 6 )
 region = Rect2( 680, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=138]
+[sub_resource type="AtlasTexture" id=188]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 0, 0, 272, 272 )
+region = Rect2( 0, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=139]
+[sub_resource type="AtlasTexture" id=189]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 272, 0, 272, 272 )
+region = Rect2( 136, 0, 136, 136 )
 
 [sub_resource type="AtlasTexture" id=140]
 flags = 13
@@ -159,35 +163,35 @@ flags = 13
 atlas = ExtResource( 3 )
 region = Rect2( 952, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=158]
+[sub_resource type="AtlasTexture" id=190]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 0, 0, 272, 272 )
+region = Rect2( 0, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=159]
+[sub_resource type="AtlasTexture" id=191]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 272, 0, 272, 272 )
+region = Rect2( 136, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=160]
+[sub_resource type="AtlasTexture" id=192]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 544, 0, 272, 272 )
+region = Rect2( 272, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=161]
+[sub_resource type="AtlasTexture" id=193]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 816, 0, 272, 272 )
+region = Rect2( 408, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=162]
+[sub_resource type="AtlasTexture" id=194]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 1088, 0, 272, 272 )
+region = Rect2( 544, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=163]
+[sub_resource type="AtlasTexture" id=195]
 flags = 13
 atlas = ExtResource( 4 )
-region = Rect2( 1360, 0, 272, 272 )
+region = Rect2( 680, 0, 136, 136 )
 
 [sub_resource type="AtlasTexture" id=164]
 flags = 13
@@ -301,7 +305,7 @@ region = Rect2( 272, 0, 136, 136 )
 
 [sub_resource type="SpriteFrames" id=93]
 animations = [ {
-"frames": [ SubResource( 134 ), SubResource( 135 ) ],
+"frames": [ SubResource( 186 ), SubResource( 187 ) ],
 "loop": false,
 "name": "fall_l",
 "speed": 8.0
@@ -311,7 +315,7 @@ animations = [ {
 "name": "fall_r",
 "speed": 8.0
 }, {
-"frames": [ SubResource( 138 ), SubResource( 139 ) ],
+"frames": [ SubResource( 188 ), SubResource( 189 ) ],
 "loop": true,
 "name": "fly_l",
 "speed": 3.0
@@ -331,7 +335,7 @@ animations = [ {
 "name": "idle_r",
 "speed": 8.0
 }, {
-"frames": [ SubResource( 158 ), SubResource( 159 ), SubResource( 160 ), SubResource( 161 ), SubResource( 162 ), SubResource( 163 ) ],
+"frames": [ SubResource( 190 ), SubResource( 191 ), SubResource( 192 ), SubResource( 193 ), SubResource( 194 ), SubResource( 195 ) ],
 "loop": false,
 "name": "jump_l",
 "speed": 8.0
@@ -452,6 +456,7 @@ script = ExtResource( 9 )
 __meta__ = {
 "_edit_group_": true
 }
+dash_multiplier = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -468,8 +473,9 @@ script = ExtResource( 8 )
 
 [node name="Wings" type="AnimatedSprite" parent="Animation"]
 visible = false
+scale = Vector2( 0.5, 0.5 )
 frames = SubResource( 73 )
-offset = Vector2( 0, -24.916 )
+offset = Vector2( 0, -37.209 )
 
 [node name="Body" type="AnimatedSprite" parent="Animation"]
 position = Vector2( 0, -13.995 )

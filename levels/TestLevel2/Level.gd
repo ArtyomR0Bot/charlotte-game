@@ -45,7 +45,7 @@ func reset():
 	orbs = 0
 	character.reset()
 	character.position = start_position
-	character.face_right()
+	character.set_face_right(true)
 	for child in $TileMap.get_children():
 		$TileMap.remove_child(child)
 		child.queue_free()

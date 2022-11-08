@@ -1,75 +1,67 @@
 extends KinematicBody2D
 
 
-enum {NONE, MOVE_RIGHT, MOVE_LEFT, STOP_MOVING, JUMP, MOVE_DOWN}
+# actions
+enum {NONE, MOVE_RIGHT, MOVE_LEFT, MOVE_SIDEWAY, STOP_MOVING,
+		MOVE_UP, STOP_MOVING_UP, MOVE_DOWN, STOP_MOVING_DOWN,
+		FLY, STOP_FLYING, ACTION_A, STOP_ACTION_A, DASH, STOP_DASHING}
+# states
 enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING, AFTER_DASH}
 
 
+export var max_speed = 700
 export var gravity = 25
 export var run_speed = 150
 export var jump_speed = 510
-export var max_speed = 700
 export var max_jumps = 1
 export var dash_multiplier = 2
 export var dash_time = 200
 export var dash_cooldown = 500
 
-
 # control
 var direction = Vector2.ZERO
-var a_button = false
+var button_a = false
 
 # inner state
+var state = FALLING
+var state_stack = []
 var last_direction = Vector2.ZERO
-var a_button_pressed = false
+var last_button_a = false
 var face_right = true
-var action = NONE
-
-var dash_end = 0
-var dash_start = 0
+var velocity: Vector2
+var move_speed: Vector2
+var move_up = false
+var move_down = false
 var in_air = true
 var in_air_start = 0
-var jump_start
-var last_input
-var last_input_time = 0
-var limit_collision = false
-var move_down = false
-var move_speed = 0
-var move_up = false
 var num_jumps = 0
+var dash_start = 0
+var dash_end = 0
 var on_ceiling = false
 var on_floor = false
 var on_wall = false
-var running = false
-var state = FALLING
-var state_mem
-var velocity: Vector2
+var limit_collision = false
+var last_action = NONE
+var last_action_time = 0
 
 
 func _physics_process(delta):
-	get_input()
-	get_action()
+	do_actions(get_input_actions())
 	if $FloorArea.shift:
 		position += $FloorArea.shift
 	var inertia = 0.8
 	if state == FLYING:
-		pass
-#		if move_up:
-#			velocity.y = -run_speed * scale.y
-#		elif move_down:
-#			velocity.y = run_speed * scale.y
+		velocity.y = move_speed.y * run_speed
 	else:
 		if on_floor:
 			in_air = false
 			num_jumps = 0
 			if limit_collision:
 				restore_collision()
-			if jump_start:
-				state = JUMPING
-				$Animation.change()
-				jump_start = false
+			if move_speed.y < 0:
+				move_speed.y = 0
 			elif state == JUMPING or state == FALLING:
-				if move_speed == 0:
+				if move_speed.x == 0:
 					state = IDLE
 				else:
 					state = RUNNING
@@ -94,94 +86,149 @@ func _physics_process(delta):
 			velocity.y += gravity
 	if state == DASHING:
 		if OS.get_ticks_msec() - dash_start > dash_time:
-			action_stop_dash()
+			do_action(STOP_DASHING)
 		else:
 			inertia = 0.5
-	var remaining_velocity_x = velocity.x * inertia
-	var move_velocity_x = direction.x * move_speed * run_speed * (1 - inertia)
-	
-	velocity.x = remaining_velocity_x + move_velocity_x
+	velocity.x = velocity.x * inertia
+	if move_speed.x != 0:
+		velocity.x += move_speed.x * run_speed * (1 - inertia)
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
-	set_collision_mask_bit(2, not move_down)
-	$FloorArea.set_collision_mask_bit(2, not move_down)
+	set_collision_mask_bit(2, move_speed.y <= 0)
+	$FloorArea.set_collision_mask_bit(2, move_speed.y <= 0)
 	move_body(delta)
 
 
-func _input(event):
-	return
-	if event.is_action_pressed("move_right"):
-		action_move_right()
-	if event.is_action_released("move_right"):
-		action_stop_moving_right()
-	if event.is_action_pressed("move_left"):
-		action_move_left()
-	if event.is_action_released("move_left"):
-		action_stop_moving_left()
-	if event.is_action_pressed("jump"):
-		action_jump()
-	if event.is_action_released("jump"):
-		action_cancel_jump()
-	if event.is_action_pressed("move_down"):
-		action_move_down()
-	if event.is_action_released("move_down"):
-		action_stop_moving_down()
-	if event.is_action_pressed("dash"):
-		action_dash()
-	if event.is_action_released("dash"):
-		action_stop_dash()
-
-
-func _notification(what):
-	match what:
-		NOTIFICATION_WM_FOCUS_OUT:
-			if move_speed > 0:
-				if direction > 0:
-					action_stop_moving_right()
-				else:
-					action_stop_moving_left()
-			if move_up:
-				action_cancel_jump()
-			if move_down:
-				action_stop_moving_down()
-
-
-func get_input():
+func get_kb_input_state():
 	direction = Vector2.ZERO
-	if Input.is_action_pressed("move_right"):
+	if Input.is_action_just_pressed("move_right"):
 		direction.x = 1
-	elif Input.is_action_pressed("move_left"):
+	elif Input.is_action_just_pressed("move_left"):
 		direction.x = -1
-	if Input.is_action_pressed("jump"):
+	elif Input.is_action_pressed("move_right") and last_direction.x > 0.5:
+		direction.x = 1
+	elif Input.is_action_pressed("move_left") and last_direction.x < -0.5:
+		direction.x = -1
+	if Input.is_action_just_pressed("move_up"):
 		direction.y = -1
-	elif Input.is_action_pressed("move_down"):
+	elif Input.is_action_just_pressed("move_down"):
 		direction.y = 1
-	if Input.is_action_pressed("dash"):
-		a_button = true
-	print(direction)
+	elif Input.is_action_pressed("move_up") and last_direction.y < -0.5:
+		direction.y = -1
+	elif Input.is_action_pressed("move_down") and last_direction.y > 0.5:
+		direction.y = 1
+	button_a = Input.is_action_pressed("button_a")
 
 
-func get_action():
-	action = NONE
-	if direction.x >= 0.5:
-		if last_direction.x < 0.5:
-			face_right = true
-			action = MOVE_RIGHT
-	elif direction.x <= -0.5:
-		if last_direction.x > -0.5:
-			face_right = false
-			action = MOVE_LEFT
-	elif last_direction.x <= -0.5 or last_direction.x >= -0.5:
-		action = STOP_MOVING
+func get_input_actions():
+	get_kb_input_state()
+	var actions = []
+	if direction.x > 0.5:
+		if last_direction.x <= 0.5:
+			actions.append(MOVE_RIGHT)
+	elif direction.x < -0.5:
+		if last_direction.x >= -0.5:
+			actions.append(MOVE_LEFT)
+	elif last_direction.x < -0.5 or last_direction.x > 0.5:
+		actions.append(STOP_MOVING)
+	if direction.y < -0.5:
+		if last_direction.y >= -0.5:
+			actions.append(MOVE_UP)
+	elif direction.y > 0.5:
+		if last_direction.y <= 0.5:
+			actions.append(MOVE_DOWN)
+	elif last_direction.y < -0.5:
+		actions.append(STOP_MOVING_UP)
+	elif last_direction.y > 0.5:
+		actions.append(STOP_MOVING_DOWN)
+	if button_a and not last_button_a:
+		actions.append(ACTION_A)
+	elif not button_a and last_button_a:
+		actions.append(STOP_ACTION_A)
 	last_direction = direction
+	last_button_a = button_a
+	return actions
 
 
-func do_action():
-	if action != NONE:
-		print(action)
-	match state:
-		FALLING:
-			pass
+func do_actions(actions):
+	for action in actions:
+		do_action(action)
+
+
+func do_action(action):
+	match action:
+		MOVE_RIGHT:
+			face_right = true
+			move_speed.x = 1
+			do_action(MOVE_SIDEWAY)
+		MOVE_LEFT:
+			face_right = false
+			move_speed.x = -1
+			do_action(MOVE_SIDEWAY)
+		MOVE_SIDEWAY:
+			if state == IDLE:
+				state = RUNNING
+			$Animation.change()
+		STOP_MOVING:
+			if state == DASHING:
+				do_action(STOP_DASHING)
+			move_speed.x = 0
+			if state == RUNNING:
+				state = IDLE
+				$Animation.change()
+		MOVE_UP:
+			if state == DASHING:
+				do_action(STOP_DASHING)
+			move_speed.y = -1
+			if (last_action == MOVE_UP
+					and OS.get_ticks_msec() - last_action_time < 250):
+				do_action(FLY)
+			elif state != FLYING:
+				if num_jumps < max_jumps:
+					num_jumps += 1
+					velocity.y = -jump_speed
+					state = JUMPING
+					$Animation.change()
+			last_action = MOVE_UP
+			last_action_time = OS.get_ticks_msec()
+		STOP_MOVING_UP:
+			if state == FLYING:
+				move_speed.y = 0
+			else:
+				if state != DASHING:
+					velocity.y /= 2
+		MOVE_DOWN:
+			move_speed.y = 1
+			if (last_action == MOVE_DOWN
+					and OS.get_ticks_msec() - last_action_time < 250):
+				do_action(STOP_FLYING)
+			last_action = MOVE_DOWN
+			last_action_time = OS.get_ticks_msec()
+		STOP_MOVING_DOWN:
+			move_speed.y = 0
+		FLY:
+			state = FLYING
+			$Animation.change()
+		STOP_FLYING:
+			state = FALLING
+			$Animation.change()
+		ACTION_A:
+			if move_speed.x != 0:
+				do_action(DASH)
+		STOP_ACTION_A:
+			if state == DASHING:
+				do_action(STOP_DASHING)
+		DASH:
+			if OS.get_ticks_msec() - dash_end > dash_cooldown:
+				state_stack.push_back(state)
+				state = DASHING
+				move_speed.x *= dash_multiplier
+				dash_start = OS.get_ticks_msec()
+				$Animation.change()
+		STOP_DASHING:
+			state = state_stack.pop_back()
+			move_speed.x = 1 * sign(move_speed.x)
+			dash_end = OS.get_ticks_msec()
 
 
 func move_body(delta):
@@ -254,133 +301,10 @@ func restore_collision():
 	limit_collision = false
 
 
-func action_move_sideway(input):
-	if state == DASHING:
-		action_stop_dash()
-	direction = -1 if input == MOVE_LEFT else 1
-	running = true
-	move_speed = 1
-	if state == IDLE:
-		state = RUNNING
-	$Animation.change()
-	last_input = input
-	last_input_time = OS.get_ticks_msec()
-
-
-func action_stop_moving_sideway(input):
-	if state == DASHING:
-		action_stop_dash()
-	var rev = -1 if input == MOVE_LEFT else 1
-	if running and direction * rev > 0:
-		running = false
-		move_speed = 0
-		if state == RUNNING:
-			state = IDLE
-		$Animation.change()
-
-
-func action_move_right():
-	action_move_sideway(MOVE_RIGHT)
-
-
-func action_stop_moving_right():
-	action_stop_moving_sideway(MOVE_RIGHT)
-
-
-func action_move_left():
-	action_move_sideway(MOVE_LEFT)
-
-
-func action_stop_moving_left():
-	action_stop_moving_sideway(MOVE_LEFT)
-
-
-func action_jump():
-	if state == DASHING:
-		action_stop_dash()
-	if (last_input == JUMP
-			and OS.get_ticks_msec() - last_input_time < 250):
-		action_fly()
-	if state == FLYING:
-		move_up = true
-	else:
-		if num_jumps < max_jumps:
-			num_jumps += 1
-			velocity.y = -jump_speed * scale.y
-			jump_start = true
-	last_input = JUMP
-	last_input_time = OS.get_ticks_msec()
-
-
-func action_cancel_jump():
-	if state == FLYING:
-		move_up = false
-		velocity.y = 0
-	else:
-		if state != DASHING:
-			velocity.y /= 2
-
-
-func action_move_down():
-	if last_input == MOVE_DOWN:
-		if OS.get_ticks_msec() - last_input_time < 250:
-			action_stop_flying()
-	last_input = MOVE_DOWN
-	last_input_time = OS.get_ticks_msec()
-	move_down = true
-
-
-func action_stop_moving_down():
-	move_down = false
-	if state == FLYING:
-		velocity.y = 0
-
-
-func action_dash():
-	if running and OS.get_ticks_msec() - dash_end > dash_cooldown:
-		state_mem = state
-		state = DASHING
-		dash_start = OS.get_ticks_msec()
-		move_speed = dash_multiplier
-		$Animation.change()
-
-
-func action_stop_dash():
-	if state == DASHING:
-		if state_mem == FLYING:
-			state = FLYING
-		else:
-			state = AFTER_DASH
-		dash_end = OS.get_ticks_msec()
-		if move_speed > 1:
-			move_speed = 1 if running else 0
-		$Animation.change()
-
-
-func action_fly():
-	if state != FLYING:
-		state = FLYING
-		in_air = false
-		num_jumps = max_jumps
-		if limit_collision:
-			restore_collision()
-		state = FLYING
-		$Animation.change()
-
-
-func action_stop_flying():
-	state = FALLING
-	$Animation.change()
-
-
 func reset():
 	velocity = Vector2.ZERO
 	state = IDLE
 
 
-func face_right():
-	face_right = true
-
-
-func face_left():
-	face_right = false
+func set_face_right(value):
+	face_right = value
