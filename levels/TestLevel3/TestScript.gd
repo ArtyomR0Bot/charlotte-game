@@ -7,6 +7,7 @@ func _ready():
 
 func _on_Start_body_entered(body):
 	body.user_input = false
+	body.do_action(body.STOP_FLYING)
 	body.do_action(body.MOVE_RIGHT)
 	$Jump.set_deferred("monitoring", true)
 
