@@ -455,6 +455,7 @@ __meta__ = {
 dash_multiplier = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2( 0, -12.937 )
 shape = SubResource( 44 )
 
@@ -477,7 +478,7 @@ position = Vector2( 0, -13.995 )
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 93 )
 animation = "idle_r"
-frame = 4
+frame = 3
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]

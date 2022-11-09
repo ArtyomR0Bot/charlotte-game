@@ -21,6 +21,7 @@ export var dash_cooldown = 500
 # control
 var direction = Vector2.ZERO
 var button_a = false
+var user_input = true
 
 # inner state
 var state = FALLING
@@ -47,7 +48,8 @@ var snap_pos: Vector2
 
 
 func _physics_process(delta):
-	do_actions(get_input_actions())
+	if user_input:
+		do_actions(get_input_actions())
 	var inertia = 0.8
 	if state == FLYING:
 		velocity.y = move_speed.y * run_speed
@@ -308,10 +310,7 @@ func restore_collision():
 	limit_collision = false
 
 
-func reset():
+func reset(f_right = true, st = FALLING):
 	velocity = Vector2.ZERO
-	state = IDLE
-
-
-func set_face_right(value):
-	face_right = value
+	state = st
+	face_right = f_right
