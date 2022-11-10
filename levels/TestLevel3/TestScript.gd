@@ -5,32 +5,33 @@ func _ready():
 	reset()
 
 
-func _on_Start_body_entered(body):
-	body.user_input = false
-	body.action_stop_flying()
-	body.action_move_right()
-	$Jump.set_deferred("monitoring", true)
+func _on_Start_body_entered(body: Character):
+	if body.character_mode != Character.CharacterMode.FLY and body.can_dash:
+		body.user_input = false
+		body.stop_flying()
+		body.move_right()
+		$Jump.set_deferred("monitoring", true)
 
 
-func _on_Jump_body_entered(body):
+func _on_Jump_body_entered(body: Character):
 	$Jump.set_deferred("monitoring", false)
-	body.action_move_up()
-	$JumpAndDash.monitoring = true
+	body.move_up()
+	$JumpAndDash.set_deferred("monitoring", true)
 
 
-func _on_JumpAndDash_body_entered(body):
-	body.action_move_up()
+func _on_JumpAndDash_body_entered(body: Character):
+	body.move_up()
 
 
-func _on_JumpAndDash_body_exited(body):
-	body.action_dash()
+func _on_JumpAndDash_body_exited(body: Character):
+	body.dash()
 	$JumpAndDash.set_deferred("monitoring", false)
 	$Stop.set_deferred("monitoring", true)
 
 
-func _on_Stop_body_entered(body):
+func _on_Stop_body_entered(body: Character):
 	$Stop.set_deferred("monitoring", false)
-	body.action_stop_moving()
+	body.stop_moving()
 	body.user_input = true
 
 
