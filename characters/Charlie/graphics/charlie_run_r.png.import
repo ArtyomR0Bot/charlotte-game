@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/wings.png-baba9dd0c92d82d34602532f4fb0613e.stex"
+path="res://.import/charlie_run_r.png-a505085444bfd67109a2c887bd68b8b6.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://common/graphics/wings.png"
-dest_files=[ "res://.import/wings.png-baba9dd0c92d82d34602532f4fb0613e.stex" ]
+source_file="res://characters/Charlie/graphics/charlie_run_r.png"
+dest_files=[ "res://.import/charlie_run_r.png-a505085444bfd67109a2c887bd68b8b6.stex" ]
 
 [params]
 

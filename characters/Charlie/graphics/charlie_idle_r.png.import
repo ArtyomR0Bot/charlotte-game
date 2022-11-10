@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/charlie_idle_l.png-f0db245b2e8338535b50a0e6c7bd3759.stex"
+path="res://.import/charlie_idle_r.png-91c9cfe05f10e8aca96aeb3cc902fcf6.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://common/graphics/charlie_idle_l.png"
-dest_files=[ "res://.import/charlie_idle_l.png-f0db245b2e8338535b50a0e6c7bd3759.stex" ]
+source_file="res://characters/Charlie/graphics/charlie_idle_r.png"
+dest_files=[ "res://.import/charlie_idle_r.png-91c9cfe05f10e8aca96aeb3cc902fcf6.stex" ]
 
 [params]
 

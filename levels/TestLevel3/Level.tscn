@@ -77,7 +77,6 @@ __meta__ = {
 
 [node name="Charlie" parent="." instance=ExtResource( 2 )]
 position = Vector2( 176, 208 )
-character_mode = 1
 
 [node name="Camera2D" type="Camera2D" parent="Charlie"]
 current = true

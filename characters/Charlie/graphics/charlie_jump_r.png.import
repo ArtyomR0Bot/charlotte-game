@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/charlie_punch.png-213c59aa016321479638b0d08d2a8f03.stex"
+path="res://.import/charlie_jump_r.png-1eee2f9c509f18e459a10d4c6b528508.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://common/graphics/charlie_punch.png"
-dest_files=[ "res://.import/charlie_punch.png-213c59aa016321479638b0d08d2a8f03.stex" ]
+source_file="res://characters/Charlie/graphics/charlie_jump_r.png"
+dest_files=[ "res://.import/charlie_jump_r.png-1eee2f9c509f18e459a10d4c6b528508.stex" ]
 
 [params]
 
