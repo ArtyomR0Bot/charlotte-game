@@ -6,7 +6,7 @@ enum CharacterMode {WALK_AND_FLY, WALK, FLY}
 # actions
 enum {NONE, MOVE_UP, MOVE_DOWN}
 # states
-enum {FALLING, IDLE, RUNNING, JUMPING, FLYING, DASHING}
+enum {FALLING, ON_FLOOR, JUMPING, FLYING, DASHING}
 
 
 export(CharacterMode) var character_mode = CharacterMode.WALK_AND_FLY
@@ -33,6 +33,7 @@ var last_button_a = false
 var face_right = true
 var velocity: Vector2
 var move_speed: Vector2
+var moving = false
 var in_air = true
 var in_air_start = 0
 var num_jumps = 0
@@ -65,10 +66,7 @@ func _physics_process(delta):
 			if move_speed.y < 0:
 				move_speed.y = 0
 			elif state == JUMPING or state == FALLING:
-				if move_speed.x == 0:
-					state = IDLE
-				else:
-					state = RUNNING
+				state = ON_FLOOR
 				$Animation.change()
 		else:
 			if state != DASHING:
@@ -164,17 +162,17 @@ func move_left():
 
 
 func move_sideway():
-	if state == IDLE:
-		state = RUNNING
-	$Animation.change()
+	if not moving:
+		moving = true
+		$Animation.change()
 
 
 func stop_moving():
 	if state == DASHING:
 		stop_dashing()
-	move_speed.x = 0
-	if state == RUNNING:
-		state = IDLE
+	if moving:
+		moving = false
+		move_speed.x = 0
 		$Animation.change()
 
 

@@ -17,14 +17,13 @@ func change():
 			set_animation($Body, "fall", dir_str, true)
 			if last_state == character.FLYING:
 				$AnimationPlayer.play("RESET")
-		character.IDLE:
+		character.ON_FLOOR:
 			if DEBUG:
-				print("IDLE")
-			set_animation($Body, "idle", dir_str)
-		character.RUNNING:
-			if DEBUG:
-				print("RUNNING")
-			set_animation($Body, "run", dir_str)
+				print("ON_FLOOR")
+			if character.moving:
+				set_animation($Body, "run", dir_str)
+			else:
+				set_animation($Body, "idle", dir_str)
 		character.JUMPING:
 			if DEBUG:
 				print("JUMPING")
