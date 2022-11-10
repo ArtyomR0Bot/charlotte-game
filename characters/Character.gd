@@ -41,7 +41,6 @@ var dash_end = 0
 var on_ceiling = false
 var on_floor = false
 var on_wall = false
-var limit_collision = false
 var last_action = NONE
 var last_action_time = 0
 var snap_pos: Vector2
@@ -63,8 +62,6 @@ func _physics_process(delta):
 		if on_floor:
 			in_air = false
 			num_jumps = 0
-			if limit_collision:
-				restore_collision()
 			if move_speed.y < 0:
 				move_speed.y = 0
 			elif state == JUMPING or state == FALLING:
@@ -262,10 +259,8 @@ func move_body(delta):
 	on_wall = false
 	on_ceiling = false
 	var num_collisions = 0
-	var num_wall_collisions = 0
 	var collision = move_and_collide_ex(velocity * delta)
 	while collision and num_collisions < 7:
-		num_collisions += 1
 		if collision.collider.has_method("collision"):
 			collision.collider.call("collision")
 		var angle = collision.get_angle(Vector2.UP)
@@ -278,7 +273,6 @@ func move_body(delta):
 			collision = move_and_collide_ex(Vector2.ZERO)
 		elif angle > 0.8:
 			on_wall = true
-			num_wall_collisions += 1
 			velocity.x = 0
 			var remainder = collision.remainder
 			var normal = collision.normal
@@ -308,12 +302,6 @@ func move_body(delta):
 			on_ceiling = false
 	else:
 		snap_pos = Vector2.ZERO
-	if num_wall_collisions > 1 and state != FLYING:
-		for owner_id in get_shape_owners():
-			var shape_owner = shape_owner_get_owner(owner_id)
-			if shape_owner.z_index < 0:
-				shape_owner.disabled = true
-		limit_collision = true
 
 
 func move_and_collide_ex(vel):
@@ -332,7 +320,6 @@ func restore_collision():
 		var shape_owner = shape_owner_get_owner(owner_id)
 		if shape_owner.z_index < 0:
 			shape_owner.disabled = false
-	limit_collision = false
 
 
 func reset(f_right = true, st = FALLING):
