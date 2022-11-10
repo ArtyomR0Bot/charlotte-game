@@ -224,6 +224,8 @@ func fly():
 
 func stop_flying():
 	if character_mode != CharacterMode.FLY:
+		if state == DASHING:
+			stop_dashing()
 		state = FALLING
 		$Animation.change()
 
