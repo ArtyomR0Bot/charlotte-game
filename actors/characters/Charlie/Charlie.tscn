@@ -1,15 +1,15 @@
 [gd_scene load_steps=72 format=2]
 
-[ext_resource path="res://characters/Charlie/graphics/charlie_run_l.png" type="Texture" id=1]
-[ext_resource path="res://characters/Charlie/graphics/charlie_run_r.png" type="Texture" id=2]
-[ext_resource path="res://characters/Charlie/graphics/charlie_idle_r.png" type="Texture" id=3]
-[ext_resource path="res://characters/Charlie/graphics/charlie_jump_l.png" type="Texture" id=4]
-[ext_resource path="res://characters/Charlie/graphics/charlie_idle_l.png" type="Texture" id=5]
-[ext_resource path="res://characters/Charlie/graphics/charlie_jump_r.png" type="Texture" id=6]
-[ext_resource path="res://characters/Charlie/graphics/wings.png" type="Texture" id=7]
-[ext_resource path="res://characters/Charlie/Animation.gd" type="Script" id=8]
-[ext_resource path="res://characters/Character.gd" type="Script" id=9]
-[ext_resource path="res://characters/Charlie/graphics/charlie_punch.png" type="Texture" id=10]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_run_l.png" type="Texture" id=1]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_run_r.png" type="Texture" id=2]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_idle_r.png" type="Texture" id=3]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_jump_l.png" type="Texture" id=4]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_idle_l.png" type="Texture" id=5]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_jump_r.png" type="Texture" id=6]
+[ext_resource path="res://actors/characters/Charlie/graphics/wings.png" type="Texture" id=7]
+[ext_resource path="res://actors/characters/Charlie/Animation.gd" type="Script" id=8]
+[ext_resource path="res://actors/Character.gd" type="Script" id=9]
+[ext_resource path="res://actors/characters/Charlie/graphics/charlie_punch.png" type="Texture" id=10]
 
 [sub_resource type="RectangleShape2D" id=44]
 extents = Vector2( 4, 12.887 )
@@ -477,7 +477,7 @@ position = Vector2( 0, -13.995 )
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 93 )
 animation = "idle_r"
-frame = 6
+frame = 3
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]

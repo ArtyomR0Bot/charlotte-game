@@ -1,49 +1,14 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://common/graphics/Tile1.tres" type="TileSet" id=1]
-[ext_resource path="res://characters/Charlie/Charlie.tscn" type="PackedScene" id=2]
+[ext_resource path="res://actors/characters/Charlie/Charlie.tscn" type="PackedScene" id=2]
 [ext_resource path="res://levels/TestLevel3/Level.gd" type="Script" id=3]
-[ext_resource path="res://icon.png" type="Texture" id=4]
-[ext_resource path="res://levels/TestLevel3/TestScript.gd" type="Script" id=5]
+[ext_resource path="res://levels/TestLevel3/Robo.gd" type="Script" id=4]
+[ext_resource path="res://levels/TestLevel3/Robo_NPC.gd" type="Script" id=5]
+[ext_resource path="res://icon.png" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 4, 4 )
-
-[sub_resource type="Animation" id=3]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 56, 200 ) ]
-}
-
-[sub_resource type="Animation" id=4]
-resource_name = "move"
-length = 10.0
-loop = true
-step = 1.0
-tracks/0/type = "value"
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 5 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ Vector2( 56, 200 ), Vector2( 176, 200 ) ]
-}
-
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 16, 24 )
+extents = Vector2( 8, 8 )
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 3 )
@@ -75,76 +40,39 @@ __meta__ = {
 "_edit_lock_": true
 }
 
+[node name="Robo" type="KinematicBody2D" parent="."]
+position = Vector2( 81, 119 )
+collision_mask = 6
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_group_": true
+}
+character_mode = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Robo"]
+position = Vector2( 0, -8 )
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="Robo"]
+position = Vector2( 0, -8 )
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 6 )
+
+[node name="NPC" type="Node2D" parent="Robo"]
+script = ExtResource( 5 )
+
+[node name="Line" type="Line2D" parent="Robo/NPC"]
+points = PoolVector2Array( 0, 0, 0, 0 )
+width = 1.0
+default_color = Color( 0.4, 1, 0.439216, 1 )
+antialiased = true
+
 [node name="Charlie" parent="." instance=ExtResource( 2 )]
 position = Vector2( 176, 208 )
+user_input = true
 max_jumps = 2
 
 [node name="Camera2D" type="Camera2D" parent="Charlie"]
 current = true
 limit_bottom = 336
 offset_v = -1.0
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="ParallaxBackground" type="ParallaxBackground" parent="CanvasLayer"]
-
-[node name="TestScript" type="Node" parent="."]
-script = ExtResource( 5 )
-
-[node name="Start" type="Area2D" parent="TestScript"]
-position = Vector2( 56, 200 )
-collision_layer = 0
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="Icon" type="Sprite" parent="TestScript/Start"]
-scale = Vector2( 0.25, 0.25 )
-z_index = -1
-texture = ExtResource( 4 )
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestScript/Start"]
-shape = SubResource( 1 )
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="TestScript/Start"]
-anims/RESET = SubResource( 3 )
-anims/move = SubResource( 4 )
-
-[node name="Jump" type="Area2D" parent="TestScript"]
-position = Vector2( 456, 200 )
-collision_layer = 0
-monitoring = false
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestScript/Jump"]
-shape = SubResource( 1 )
-
-[node name="JumpAndDash" type="Area2D" parent="TestScript"]
-position = Vector2( 704, 184 )
-collision_layer = 0
-monitoring = false
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestScript/JumpAndDash"]
-shape = SubResource( 2 )
-
-[node name="Stop" type="Area2D" parent="TestScript"]
-position = Vector2( 968, 200 )
-collision_layer = 0
-monitoring = false
-__meta__ = {
-"_edit_group_": true
-}
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestScript/Stop"]
-shape = SubResource( 1 )
-
-[connection signal="body_entered" from="TestScript/Start" to="TestScript" method="_on_Start_body_entered"]
-[connection signal="body_entered" from="TestScript/Jump" to="TestScript" method="_on_Jump_body_entered"]
-[connection signal="body_entered" from="TestScript/JumpAndDash" to="TestScript" method="_on_JumpAndDash_body_entered"]
-[connection signal="body_exited" from="TestScript/JumpAndDash" to="TestScript" method="_on_JumpAndDash_body_exited"]
-[connection signal="body_entered" from="TestScript/Stop" to="TestScript" method="_on_Stop_body_entered"]

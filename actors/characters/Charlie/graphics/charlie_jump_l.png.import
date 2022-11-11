@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/charlie_idle_r.png-91c9cfe05f10e8aca96aeb3cc902fcf6.stex"
+path="res://.import/charlie_jump_l.png-2b1a8374fbf1a6d9d52cd194960f0a53.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://characters/Charlie/graphics/charlie_idle_r.png"
-dest_files=[ "res://.import/charlie_idle_r.png-91c9cfe05f10e8aca96aeb3cc902fcf6.stex" ]
+source_file="res://actors/characters/Charlie/graphics/charlie_jump_l.png"
+dest_files=[ "res://.import/charlie_jump_l.png-2b1a8374fbf1a6d9d52cd194960f0a53.stex" ]
 
 [params]
 

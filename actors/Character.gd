@@ -2,6 +2,7 @@ extends KinematicBody2D
 
 class_name Character
 
+
 enum CharacterMode {WALK_AND_FLY, WALK, FLY}
 # actions
 enum {NONE, MOVE_UP, MOVE_DOWN}
@@ -10,6 +11,7 @@ enum {FALLING, ON_FLOOR, JUMPING, FLYING, DASHING}
 
 
 export(CharacterMode) var character_mode = CharacterMode.WALK_AND_FLY
+export var user_input = false
 export var can_dash = true
 export var max_speed = 700
 export var gravity = 25
@@ -23,7 +25,6 @@ export var dash_cooldown = 500
 # control
 var direction = Vector2.ZERO
 var button_a = false
-var user_input = true
 
 # inner state
 var state = FALLING
@@ -45,11 +46,13 @@ var last_action = NONE
 var last_action_time = 0
 var snap_pos: Vector2
 
+onready var has_animation = has_node("Animation")
+
 
 func _ready():
 	if character_mode == CharacterMode.FLY:
 		state = FLYING
-	$Animation.change()
+	change_animation()
 
 
 func _physics_process(delta):
@@ -63,7 +66,7 @@ func _physics_process(delta):
 			in_air = false
 			num_jumps = 0
 			state = ON_FLOOR
-			$Animation.change()
+			change_animation()
 		velocity.y += gravity
 		inertia = 0.95
 	elif state == ON_FLOOR:
@@ -78,7 +81,7 @@ func _physics_process(delta):
 					inertia = 0.95
 					if OS.get_ticks_msec() - in_air_start > 200:
 						state = FALLING
-						$Animation.change()
+						change_animation()
 				elif OS.get_ticks_msec() - in_air_start > 0:
 					num_jumps = 1
 			else:
@@ -163,14 +166,14 @@ func move_left():
 func move_sideway():
 	if state == DASHING:
 		stop_dashing()
-	$Animation.change()
+	change_animation()
 
 
 func stop_moving():
 	if state == DASHING:
 		stop_dashing()
 	speed.x = 0
-	$Animation.change()
+	change_animation()
 
 
 func move_up():
@@ -185,7 +188,7 @@ func move_up():
 			num_jumps += 1
 			velocity.y = -jump_speed
 			state = JUMPING
-			$Animation.change()
+			change_animation()
 	last_action = MOVE_UP
 	last_action_time = OS.get_ticks_msec()
 
@@ -213,7 +216,7 @@ func fly():
 	if character_mode != CharacterMode.WALK:
 		num_jumps = max_jumps
 		state = FLYING
-		$Animation.change()
+		change_animation()
 
 
 func stop_flying():
@@ -221,7 +224,7 @@ func stop_flying():
 		if state == DASHING:
 			stop_dashing()
 		state = FALLING
-		$Animation.change()
+		change_animation()
 
 
 func do_action_a():
@@ -240,14 +243,14 @@ func dash():
 		state = DASHING
 		speed.x *= dash_multiplier
 		dash_start = OS.get_ticks_msec()
-		$Animation.change()
+		change_animation()
 
 
 func stop_dashing():
 	state = state_stack.pop_back()
 	speed.x = 1 * sign(speed.x)
 	dash_end = OS.get_ticks_msec()
-	$Animation.change()
+	change_animation()
 
 
 func move_body(delta):
@@ -322,3 +325,8 @@ func reset(f_right = true, st = FALLING):
 	velocity = Vector2.ZERO
 	state = st
 	face_right = f_right
+
+
+func change_animation():
+	if has_animation:
+		$Animation.change()
