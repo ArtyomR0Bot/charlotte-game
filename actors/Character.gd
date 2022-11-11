@@ -233,8 +233,7 @@ func do_action_a():
 
 
 func stop_action_a():
-	if state == DASHING:
-		stop_dashing()
+	pass
 
 
 func dash():
