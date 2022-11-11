@@ -20,10 +20,10 @@ func change():
 		character.ON_FLOOR:
 			if DEBUG:
 				print("ON_FLOOR")
-			if character.moving:
-				set_animation($Body, "run", dir_str)
-			else:
+			if character.speed.x == 0:
 				set_animation($Body, "idle", dir_str)
+			else:
+				set_animation($Body, "run", dir_str)
 		character.JUMPING:
 			if DEBUG:
 				print("JUMPING")

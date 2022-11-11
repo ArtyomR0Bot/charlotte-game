@@ -27,13 +27,12 @@ var user_input = true
 
 # inner state
 var state = FALLING
-var last_state = state
+var state_stack = []
 var last_direction = Vector2.ZERO
 var last_button_a = false
 var face_right = true
 var velocity: Vector2
-var move_speed: Vector2
-var moving = false
+var speed: Vector2
 var in_air = true
 var in_air_start = 0
 var num_jumps = 0
@@ -58,45 +57,45 @@ func _physics_process(delta):
 		do_input_actions()
 	var inertia = 0.8
 	if state == FLYING:
-		velocity.y = move_speed.y * run_speed
-	else:
-		if on_floor:
+		velocity.y = speed.y * run_speed
+	elif state == FALLING or state == JUMPING:
+		if on_floor and velocity.y >= 0:
 			in_air = false
 			num_jumps = 0
-			if move_speed.y < 0:
-				move_speed.y = 0
-			elif state == JUMPING or state == FALLING:
-				state = ON_FLOOR
-				$Animation.change()
+			state = ON_FLOOR
+			$Animation.change()
+		velocity.y += gravity
+		inertia = 0.95
+	elif state == ON_FLOOR:
+		if on_floor:
+			if in_air:
+				in_air = false
+				if num_jumps > 0:
+					num_jumps = 0
 		else:
-			if state != DASHING:
-				inertia = 0.95
-				if in_air:
-					if (num_jumps == 0
-							and OS.get_ticks_msec() - in_air_start > 0):
-						num_jumps = 1
-					if (state != FALLING and state != JUMPING
-							and OS.get_ticks_msec() - in_air_start > 200):
+			if in_air:
+				if num_jumps > 0:
+					inertia = 0.95
+					if OS.get_ticks_msec() - in_air_start > 200:
 						state = FALLING
 						$Animation.change()
-				else:
-					in_air = true
-					in_air_start = OS.get_ticks_msec()
-		if state == DASHING:
-			velocity.y = 0
-		else:
-			velocity.y += gravity
-	if state == DASHING:
+				elif OS.get_ticks_msec() - in_air_start > 0:
+					num_jumps = 1
+			else:
+				in_air = true
+				in_air_start = OS.get_ticks_msec()
+		velocity.y += gravity
+	elif state == DASHING:
+		velocity.y = 0
+		inertia = 0.5
 		if OS.get_ticks_msec() - dash_start > dash_time:
 			stop_dashing()
-		else:
-			inertia = 0.5
 	velocity.x = velocity.x * inertia
-	if move_speed.x != 0:
-		velocity.x += move_speed.x * run_speed * (1 - inertia)
+	if speed.x != 0:
+		velocity.x += speed.x * run_speed * (1 - inertia)
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
-	set_collision_mask_bit(2, move_speed.y <= 0)
+	set_collision_mask_bit(2, speed.y <= 0)
 	move_body(delta)
 
 
@@ -151,39 +150,37 @@ func get_kb_input_state():
 
 func move_right():
 	face_right = true
-	move_speed.x = 1
+	speed.x = 1
 	move_sideway()
 
 
 func move_left():
 	face_right = false
-	move_speed.x = -1
+	speed.x = -1
 	move_sideway()
 
 
 func move_sideway():
-	if not moving:
-		moving = true
-		$Animation.change()
+	if state == DASHING:
+		stop_dashing()
+	$Animation.change()
 
 
 func stop_moving():
 	if state == DASHING:
 		stop_dashing()
-	if moving:
-		moving = false
-		move_speed.x = 0
-		$Animation.change()
+	speed.x = 0
+	$Animation.change()
 
 
 func move_up():
+	speed.y = -1
 	if state == DASHING:
 		stop_dashing()
-	move_speed.y = -1
 	if (last_action == MOVE_UP
 			and OS.get_ticks_msec() - last_action_time < 250):
 		fly()
-	elif state != FLYING:
+	elif state == FALLING or state == ON_FLOOR or state == JUMPING:
 		if num_jumps < max_jumps:
 			num_jumps += 1
 			velocity.y = -jump_speed
@@ -194,15 +191,13 @@ func move_up():
 
 
 func stop_moving_up():
-	if state == FLYING:
-		move_speed.y = 0
-	else:
-		if state != DASHING:
-			velocity.y /= 2
+	speed.y = 0
+	if state == JUMPING:
+		velocity.y /= 2
 
 
 func move_down():
-	move_speed.y = 1
+	speed.y = 1
 	if (last_action == MOVE_DOWN
 			and OS.get_ticks_msec() - last_action_time < 250):
 		stop_flying()
@@ -211,11 +206,12 @@ func move_down():
 
 
 func stop_moving_down():
-	move_speed.y = 0
+	speed.y = 0
 
 
 func fly():
 	if character_mode != CharacterMode.WALK:
+		num_jumps = max_jumps
 		state = FLYING
 		$Animation.change()
 
@@ -229,7 +225,7 @@ func stop_flying():
 
 
 func do_action_a():
-	if move_speed.x != 0:
+	if speed.x != 0:
 		dash()
 
 
@@ -240,16 +236,16 @@ func stop_action_a():
 
 func dash():
 	if can_dash and OS.get_ticks_msec() - dash_end > dash_cooldown:
-		last_state = state
+		state_stack.push_back(state)
 		state = DASHING
-		move_speed.x *= dash_multiplier
+		speed.x *= dash_multiplier
 		dash_start = OS.get_ticks_msec()
 		$Animation.change()
 
 
 func stop_dashing():
-	state = last_state
-	move_speed.x = 1 * sign(move_speed.x)
+	state = state_stack.pop_back()
+	speed.x = 1 * sign(speed.x)
 	dash_end = OS.get_ticks_msec()
 	$Animation.change()
 
