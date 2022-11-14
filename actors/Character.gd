@@ -15,7 +15,7 @@ export var user_input = false
 export var can_dash = true
 export var max_speed = 700
 export var gravity = 25
-export var run_speed = 150
+export var movement_speed = 150
 export var jump_speed = 510
 export var max_jumps = 1
 export var dash_multiplier = 3
@@ -60,7 +60,7 @@ func _physics_process(delta):
 		do_input_actions()
 	var inertia = 0.8
 	if state == FLYING:
-		velocity.y = speed.y * run_speed
+		velocity.y = speed.y * movement_speed
 	elif state == FALLING or state == JUMPING:
 		if on_floor and velocity.y >= 0:
 			in_air = false
@@ -95,7 +95,7 @@ func _physics_process(delta):
 			stop_dashing()
 	velocity.x = velocity.x * inertia
 	if speed.x != 0:
-		velocity.x += speed.x * run_speed * (1 - inertia)
+		velocity.x += speed.x * movement_speed * (1 - inertia)
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
 	set_collision_mask_bit(2, speed.y <= 0)
@@ -320,10 +320,10 @@ func restore_collision():
 			shape_owner.disabled = false
 
 
-func reset(f_right = true, st = FALLING):
+func reset(f_right = true):
 	velocity = Vector2.ZERO
-	state = st
 	face_right = f_right
+	state = FALLING
 
 
 func change_animation():

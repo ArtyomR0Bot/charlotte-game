@@ -8,7 +8,7 @@
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_jump_r.png" type="Texture" id=6]
 [ext_resource path="res://actors/characters/Charlie/graphics/wings.png" type="Texture" id=7]
 [ext_resource path="res://actors/characters/Charlie/Animation.gd" type="Script" id=8]
-[ext_resource path="res://actors/Character.gd" type="Script" id=9]
+[ext_resource path="res://actors/MovingBody.gd" type="Script" id=9]
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_punch.png" type="Texture" id=10]
 
 [sub_resource type="RectangleShape2D" id=44]
@@ -477,7 +477,7 @@ position = Vector2( 0, -13.995 )
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 93 )
 animation = "idle_r"
-frame = 3
+frame = 5
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]
