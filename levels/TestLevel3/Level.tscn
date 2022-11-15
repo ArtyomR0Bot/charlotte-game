@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://common/graphics/Tile1.tres" type="TileSet" id=1]
 [ext_resource path="res://actors/characters/Charlie/Charlie.tscn" type="PackedScene" id=2]
 [ext_resource path="res://levels/TestLevel3/Level.gd" type="Script" id=3]
-[ext_resource path="res://levels/TestLevel3/Robo.gd" type="Script" id=4]
 [ext_resource path="res://levels/TestLevel3/Robo_NPC.gd" type="Script" id=5]
 [ext_resource path="res://icon.png" type="Texture" id=6]
 
@@ -45,11 +44,9 @@ __meta__ = {
 [node name="Robo" type="KinematicBody2D" parent="."]
 position = Vector2( 81, 119 )
 collision_mask = 6
-script = ExtResource( 4 )
 __meta__ = {
 "_edit_group_": true
 }
-character_mode = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Robo"]
 position = Vector2( 0, -8 )
@@ -84,7 +81,7 @@ __meta__ = {
 }
 
 [node name="Charlie" parent="." instance=ExtResource( 2 )]
-position = Vector2( -3, 203 )
+position = Vector2( 597, -109 )
 user_input = true
 max_jumps = 2
 

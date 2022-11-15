@@ -51,6 +51,7 @@ onready var has_animation = has_node("Animation")
 
 func _ready():
 	if character_mode == CharacterMode.FLY:
+		print("flying")
 		state = FLYING
 	change_animation()
 
@@ -61,7 +62,7 @@ func _physics_process(delta):
 	do_input_actions()
 	var inertia = 0.8
 	if state == FLYING:
-		velocity.y = lerp(velocity.y, speed.y * movement_speed, 1 - inertia)
+		velocity.y = lerp(speed.y * movement_speed, velocity.y, inertia)
 	elif state == FALLING:
 		velocity.y += gravity
 		inertia = 0.95
@@ -100,10 +101,9 @@ func _physics_process(delta):
 		inertia = 0.5
 		if OS.get_ticks_msec() - dash_start > dash_time:
 			stop_dashing()
-	velocity.x = lerp(velocity.x, speed.x * movement_speed, 1 - inertia)
+	velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
-	set_collision_mask_bit(2, speed.y <= 0)
 	move_body(delta)
 
 
@@ -267,6 +267,7 @@ func move_body(delta):
 	var num_collisions = 0
 	var collision = move_and_collide_ex(velocity * delta)
 	while collision and num_collisions < 7:
+		num_collisions += 1
 		if collision.collider.has_method("collision"):
 			collision.collider.call("collision")
 		var angle = collision.get_angle(Vector2.UP)
@@ -308,16 +309,18 @@ func move_body(delta):
 			on_ceiling = false
 	else:
 		snap_pos = Vector2.ZERO
+	print("%s %s %s" % [OS.get_ticks_msec(), on_floor, num_collisions])
 
 
 func move_and_collide_ex(vel):
+	set_collision_mask_bit(2, speed.y <= 0)
 	var collision = move_and_collide(vel)
-	if not collision:
-		return
-	if collision.local_shape.z_index < 0:
-		if collision.collider.get_collision_layer_bit(2):
-			position += collision.remainder
-			return
+	if (collision
+			and collision.local_shape.z_index < 0
+			and collision.collider.get_collision_layer_bit(2)):
+		set_collision_mask_bit(2, false)
+		collision = move_and_collide(collision.remainder)
+		set_collision_mask_bit(2, speed.y <= 0)
 	return collision
 
 
