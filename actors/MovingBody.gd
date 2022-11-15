@@ -51,7 +51,6 @@ onready var has_animation = has_node("Animation")
 
 func _ready():
 	if character_mode == CharacterMode.FLY:
-		print("flying")
 		state = FLYING
 	change_animation()
 
@@ -309,7 +308,6 @@ func move_body(delta):
 			on_ceiling = false
 	else:
 		snap_pos = Vector2.ZERO
-	print("%s %s %s" % [OS.get_ticks_msec(), on_floor, num_collisions])
 
 
 func move_and_collide_ex(vel):
