@@ -14,7 +14,8 @@ func change():
 		character.FALLING:
 			if DEBUG:
 				print("FALLING")
-			set_animation($Body, "fall", dir_str, true)
+			var same_state = last_state == character.state
+			set_animation($Body, "fall", dir_str, same_state)
 			if last_state == character.FLYING:
 				$AnimationPlayer.play("RESET")
 		character.ON_FLOOR:
@@ -43,9 +44,9 @@ func change():
 	last_state = character.state
 
 
-func set_animation(sprite, name, dir_str, keep_frame = false, restart = false):
+func set_animation(sprite, name, dir_str, keep_frame = false):
 	var full_name = name + dir_str
-	if restart or sprite.animation != full_name:
+	if sprite.animation != full_name:
 		if keep_frame:
 			var current_frame = sprite.frame
 			sprite.animation = full_name

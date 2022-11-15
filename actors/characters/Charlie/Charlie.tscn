@@ -1,4 +1,4 @@
-[gd_scene load_steps=72 format=2]
+[gd_scene load_steps=68 format=2]
 
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_run_l.png" type="Texture" id=1]
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_run_r.png" type="Texture" id=2]
@@ -182,16 +182,6 @@ flags = 13
 atlas = ExtResource( 4 )
 region = Rect2( 408, 0, 136, 136 )
 
-[sub_resource type="AtlasTexture" id=194]
-flags = 13
-atlas = ExtResource( 4 )
-region = Rect2( 544, 0, 136, 136 )
-
-[sub_resource type="AtlasTexture" id=195]
-flags = 13
-atlas = ExtResource( 4 )
-region = Rect2( 680, 0, 136, 136 )
-
 [sub_resource type="AtlasTexture" id=164]
 flags = 13
 atlas = ExtResource( 6 )
@@ -211,16 +201,6 @@ region = Rect2( 272, 0, 136, 136 )
 flags = 13
 atlas = ExtResource( 6 )
 region = Rect2( 408, 0, 136, 136 )
-
-[sub_resource type="AtlasTexture" id=168]
-flags = 13
-atlas = ExtResource( 6 )
-region = Rect2( 544, 0, 136, 136 )
-
-[sub_resource type="AtlasTexture" id=169]
-flags = 13
-atlas = ExtResource( 6 )
-region = Rect2( 680, 0, 136, 136 )
 
 [sub_resource type="AtlasTexture" id=170]
 flags = 13
@@ -334,15 +314,15 @@ animations = [ {
 "name": "idle_r",
 "speed": 8.0
 }, {
-"frames": [ SubResource( 190 ), SubResource( 191 ), SubResource( 192 ), SubResource( 193 ), SubResource( 194 ), SubResource( 195 ) ],
+"frames": [ SubResource( 190 ), SubResource( 191 ), SubResource( 192 ), SubResource( 193 ) ],
 "loop": false,
 "name": "jump_l",
-"speed": 8.0
+"speed": 24.0
 }, {
-"frames": [ SubResource( 164 ), SubResource( 165 ), SubResource( 166 ), SubResource( 167 ), SubResource( 168 ), SubResource( 169 ) ],
+"frames": [ SubResource( 164 ), SubResource( 165 ), SubResource( 166 ), SubResource( 167 ) ],
 "loop": false,
 "name": "jump_r",
-"speed": 8.0
+"speed": 24.0
 }, {
 "frames": [ SubResource( 170 ), SubResource( 171 ), SubResource( 172 ), SubResource( 173 ), SubResource( 174 ) ],
 "loop": true,
@@ -476,8 +456,8 @@ offset = Vector2( 0, -37.209 )
 position = Vector2( 0, -13.995 )
 scale = Vector2( 0.25, 0.25 )
 frames = SubResource( 93 )
-animation = "idle_r"
-frame = 5
+animation = "fall_r"
+frame = 1
 playing = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Animation"]
