@@ -28,6 +28,7 @@ var button_a = false
 
 # inner state
 var state = FALLING
+var new_state
 var state_stack = []
 var last_direction = Vector2.ZERO
 var last_button_a = false
@@ -51,215 +52,77 @@ onready var has_animation = has_node("Animation")
 
 func _ready():
 	if character_mode == CharacterMode.FLY:
-		state = FLYING
+		set_state(FLYING)
 	change_animation()
 
 
 func _physics_process(delta):
+	process_input()
+	process_state(delta)
+	set_limits()
+	process_collisions(delta)
+
+
+func process_input():
 	if user_input:
 		get_user_input()
 	do_input_actions()
-	var inertia = 0.8
-	if state == FLYING:
-		velocity.y = lerp(speed.y * movement_speed, velocity.y, inertia)
-	elif state == FALLING:
-		velocity.y += gravity
-		inertia = 0.95
-		if on_floor and velocity.y >= 0:
-			in_air = false
-			num_jumps = 0
-			state = ON_FLOOR
-			change_animation()
-	elif state == JUMPING:
-		velocity.y += gravity
-		inertia = 0.95
-		if velocity.y >= 0:
-			state = FALLING
-			change_animation()
-	elif state == ON_FLOOR:
-		velocity.y += gravity
-		if on_floor:
-			if in_air:
+
+
+func process_state(delta):
+	match state:
+		FLYING:
+			var inertia = 0.8
+			velocity.y = lerp(speed.y * movement_speed, velocity.y, inertia)
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+		FALLING:
+			var inertia = 0.95
+			velocity.y += gravity
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+			if on_floor and velocity.y >= 0:
 				in_air = false
-				if num_jumps > 0:
-					num_jumps = 0
-		else:
-			if in_air:
-				if num_jumps > 0:
-					inertia = 0.95
-					if OS.get_ticks_msec() - in_air_start > 200:
-						state = FALLING
-						change_animation()
-				elif OS.get_ticks_msec() - in_air_start > 0:
-					num_jumps = 1
+				num_jumps = 0
+				set_state(ON_FLOOR)
+		JUMPING:
+			var inertia = 0.95
+			velocity.y += gravity
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+			if velocity.y >= 0:
+				set_state(FALLING)
+		ON_FLOOR:
+			var inertia = 0.8
+			velocity.y += gravity
+			if on_floor:
+				if in_air:
+					in_air = false
+					if num_jumps > 0:
+						num_jumps = 0
 			else:
-				in_air = true
-				in_air_start = OS.get_ticks_msec()
-	elif state == DASHING:
-		velocity.y = 0
-		inertia = 0.5
-		if OS.get_ticks_msec() - dash_start > dash_time:
-			stop_dashing()
-	velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+				if in_air:
+					if num_jumps > 0:
+						inertia = 0.95
+						if OS.get_ticks_msec() - in_air_start > 200:
+							set_state(FALLING)
+					elif OS.get_ticks_msec() - in_air_start > 0:
+						num_jumps = 1
+				else:
+					in_air = true
+					in_air_start = OS.get_ticks_msec()
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+		DASHING:
+			var inertia = 0.5
+			velocity.y = 0
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+			if OS.get_ticks_msec() - dash_start > dash_time:
+				stop_dashing()
+
+
+func set_limits():
 	velocity.y = clamp(velocity.y, -max_speed, max_speed)
 	velocity.x = clamp(velocity.x, -max_speed, max_speed)
-	move_body(delta)
 
 
-func get_user_input():
-	get_kb_input_state()
-
-
-func do_input_actions():
-	if direction.x > 0.5:
-		if last_direction.x <= 0.5:
-			move_right()
-	elif direction.x < -0.5:
-		if last_direction.x >= -0.5:
-			move_left()
-	elif last_direction.x < -0.5 or last_direction.x > 0.5:
-		stop_moving()
-	if direction.y < -0.5:
-		if last_direction.y >= -0.5:
-			move_up()
-	elif direction.y > 0.5:
-		if last_direction.y <= 0.5:
-			move_down()
-	elif last_direction.y < -0.5:
-		stop_moving_up()
-	elif last_direction.y > 0.5:
-		stop_moving_down()
-	if button_a and not last_button_a:
-		do_action_a()
-	elif not button_a and last_button_a:
-		stop_action_a()
-	last_direction = direction
-	last_button_a = button_a
-
-
-func get_kb_input_state():
-	direction = Vector2.ZERO
-	if Input.is_action_just_pressed("move_right"):
-		direction.x = 1
-	elif Input.is_action_just_pressed("move_left"):
-		direction.x = -1
-	elif Input.is_action_pressed("move_right") and last_direction.x > 0.5:
-		direction.x = 1
-	elif Input.is_action_pressed("move_left") and last_direction.x < -0.5:
-		direction.x = -1
-	if Input.is_action_just_pressed("move_up"):
-		direction.y = -1
-	elif Input.is_action_just_pressed("move_down"):
-		direction.y = 1
-	elif Input.is_action_pressed("move_up") and last_direction.y < -0.5:
-		direction.y = -1
-	elif Input.is_action_pressed("move_down") and last_direction.y > 0.5:
-		direction.y = 1
-	button_a = Input.is_action_pressed("button_a")
-
-
-func move_right():
-	face_right = true
-	speed.x = 1
-	move_sideway()
-
-
-func move_left():
-	face_right = false
-	speed.x = -1
-	move_sideway()
-
-
-func move_sideway():
-	if state == DASHING:
-		stop_dashing()
-	change_animation()
-
-
-func stop_moving():
-	if state == DASHING:
-		stop_dashing()
-	speed.x = 0
-	change_animation()
-
-
-func move_up():
-	speed.y = -1
-	if state == DASHING:
-		stop_dashing()
-	if (last_action == MOVE_UP
-			and OS.get_ticks_msec() - last_action_time < 250):
-		fly()
-	elif state == FALLING or state == ON_FLOOR or state == JUMPING:
-		if num_jumps < max_jumps:
-			num_jumps += 1
-			velocity.y = -jump_speed
-			state = JUMPING
-			change_animation()
-	last_action = MOVE_UP
-	last_action_time = OS.get_ticks_msec()
-
-
-func stop_moving_up():
-	speed.y = 0
-	if state == JUMPING:
-		velocity.y /= 2
-
-
-func move_down():
-	speed.y = 1
-	if (last_action == MOVE_DOWN
-			and OS.get_ticks_msec() - last_action_time < 250):
-		stop_flying()
-	last_action = MOVE_DOWN
-	last_action_time = OS.get_ticks_msec()
-
-
-func stop_moving_down():
-	speed.y = 0
-
-
-func fly():
-	if character_mode != CharacterMode.WALK:
-		num_jumps = max_jumps
-		state = FLYING
-		change_animation()
-
-
-func stop_flying():
-	if character_mode != CharacterMode.FLY:
-		if state == DASHING:
-			stop_dashing()
-		state = FALLING
-		change_animation()
-
-
-func do_action_a():
-	if speed.x != 0:
-		dash()
-
-
-func stop_action_a():
-	pass
-
-
-func dash():
-	if can_dash and OS.get_ticks_msec() - dash_end > dash_cooldown:
-		state_stack.push_back(state)
-		state = DASHING
-		speed.x *= dash_multiplier
-		dash_start = OS.get_ticks_msec()
-		change_animation()
-
-
-func stop_dashing():
-	state = state_stack.pop_back()
-	speed.x = 1 * sign(speed.x)
-	dash_end = OS.get_ticks_msec()
-	change_animation()
-
-
-func move_body(delta):
+func process_collisions(delta):
 	on_floor = false
 	on_wall = false
 	on_ceiling = false
@@ -310,6 +173,63 @@ func move_body(delta):
 		snap_pos = Vector2.ZERO
 
 
+func get_user_input():
+	get_kb_input_state()
+
+
+func get_kb_input_state():
+	direction = Vector2.ZERO
+	if Input.is_action_just_pressed("move_right"):
+		direction.x = 1
+	elif Input.is_action_just_pressed("move_left"):
+		direction.x = -1
+	elif Input.is_action_pressed("move_right") and last_direction.x > 0.5:
+		direction.x = 1
+	elif Input.is_action_pressed("move_left") and last_direction.x < -0.5:
+		direction.x = -1
+	if Input.is_action_just_pressed("move_up"):
+		direction.y = -1
+	elif Input.is_action_just_pressed("move_down"):
+		direction.y = 1
+	elif Input.is_action_pressed("move_up") and last_direction.y < -0.5:
+		direction.y = -1
+	elif Input.is_action_pressed("move_down") and last_direction.y > 0.5:
+		direction.y = 1
+	button_a = Input.is_action_pressed("button_a")
+
+
+func do_input_actions():
+	if direction.x > 0.5:
+		if last_direction.x <= 0.5:
+			move_right()
+	elif direction.x < -0.5:
+		if last_direction.x >= -0.5:
+			move_left()
+	elif last_direction.x < -0.5 or last_direction.x > 0.5:
+		stop_moving()
+	if direction.y < -0.5:
+		if last_direction.y >= -0.5:
+			move_up()
+	elif direction.y > 0.5:
+		if last_direction.y <= 0.5:
+			move_down()
+	elif last_direction.y < -0.5:
+		stop_moving_up()
+	elif last_direction.y > 0.5:
+		stop_moving_down()
+	if button_a and not last_button_a:
+		do_action_a()
+	elif not button_a and last_button_a:
+		stop_action_a()
+	last_direction = direction
+	last_button_a = button_a
+
+
+func set_state(new_state):
+	state = new_state
+	change_animation()
+
+
 func move_and_collide_ex(vel):
 	set_collision_mask_bit(2, speed.y <= 0)
 	var collision = move_and_collide(vel)
@@ -332,9 +252,110 @@ func restore_collision():
 func reset(f_right = true):
 	velocity = Vector2.ZERO
 	face_right = f_right
-	state = FALLING
+	set_state(FALLING)
 
 
 func change_animation():
 	if has_animation:
 		$Animation.change()
+
+
+func move_right():
+	face_right = true
+	speed.x = 1
+	move_sideway()
+
+
+func move_left():
+	face_right = false
+	speed.x = -1
+	move_sideway()
+
+
+func move_sideway():
+	if state == DASHING:
+		stop_dashing()
+	change_animation()
+
+
+func stop_moving():
+	if state == DASHING:
+		stop_dashing()
+	speed.x = 0
+	change_animation()
+
+
+func move_up():
+	speed.y = -1
+	if state == DASHING:
+		stop_dashing()
+	if (last_action == MOVE_UP
+			and OS.get_ticks_msec() - last_action_time < 250):
+		fly()
+	elif state == FALLING or state == ON_FLOOR or state == JUMPING:
+		if num_jumps < max_jumps:
+			num_jumps += 1
+			velocity.y = -jump_speed
+			set_state(JUMPING)
+			change_animation()
+	last_action = MOVE_UP
+	last_action_time = OS.get_ticks_msec()
+
+
+func stop_moving_up():
+	speed.y = 0
+	if state == JUMPING:
+		velocity.y /= 2
+
+
+func move_down():
+	speed.y = 1
+	if (last_action == MOVE_DOWN
+			and OS.get_ticks_msec() - last_action_time < 250):
+		stop_flying()
+	last_action = MOVE_DOWN
+	last_action_time = OS.get_ticks_msec()
+
+
+func stop_moving_down():
+	speed.y = 0
+
+
+func fly():
+	if character_mode != CharacterMode.WALK:
+		num_jumps = max_jumps
+		set_state(FLYING)
+		change_animation()
+
+
+func stop_flying():
+	if character_mode != CharacterMode.FLY:
+		if state == DASHING:
+			stop_dashing()
+		set_state(FALLING)
+		change_animation()
+
+
+func do_action_a():
+	if speed.x != 0:
+		dash()
+
+
+func stop_action_a():
+	pass
+
+
+func dash():
+	if can_dash and OS.get_ticks_msec() - dash_end > dash_cooldown:
+		state_stack.push_back(state)
+		set_state(DASHING)
+		speed.x *= dash_multiplier
+		dash_start = OS.get_ticks_msec()
+		change_animation()
+
+
+func stop_dashing():
+	set_state(state_stack.pop_back())
+	speed.x = 1 * sign(speed.x)
+	dash_end = OS.get_ticks_msec()
+	change_animation()
