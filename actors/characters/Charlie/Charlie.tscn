@@ -8,7 +8,7 @@
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_jump_r.png" type="Texture" id=6]
 [ext_resource path="res://actors/characters/Charlie/graphics/wings.png" type="Texture" id=7]
 [ext_resource path="res://actors/characters/Charlie/Animation.gd" type="Script" id=8]
-[ext_resource path="res://actors/MovingBody.gd" type="Script" id=9]
+[ext_resource path="res://actors/characters/Charlie/Charlie.gd" type="Script" id=9]
 [ext_resource path="res://actors/characters/Charlie/graphics/charlie_punch.png" type="Texture" id=10]
 
 [sub_resource type="RectangleShape2D" id=44]

@@ -7,20 +7,16 @@ enum CharacterMode {WALK_AND_FLY, WALK, FLY}
 # actions
 enum {NONE, MOVE_UP, MOVE_DOWN}
 # states
-enum {FALLING, ON_FLOOR, JUMPING, FLYING, DASHING}
+enum {FALLING, ON_FLOOR, JUMPING, FLYING}
 
 
 export(CharacterMode) var character_mode = CharacterMode.WALK_AND_FLY
 export var user_input = false
-export var can_dash = true
 export var max_speed = 700
 export var gravity = 25
 export var movement_speed = 150
 export var jump_speed = 510
 export var max_jumps = 1
-export var dash_multiplier = 3
-export var dash_time = 200
-export var dash_cooldown = 500
 
 # control
 var direction = Vector2.ZERO
@@ -28,7 +24,6 @@ var button_a = false
 
 # inner state
 var state = FALLING
-var new_state
 var state_stack = []
 var last_direction = Vector2.ZERO
 var last_button_a = false
@@ -38,8 +33,6 @@ var speed: Vector2
 var in_air = true
 var in_air_start = 0
 var num_jumps = 0
-var dash_start = 0
-var dash_end = 0
 var on_ceiling = false
 var on_floor = false
 var on_wall = false
@@ -58,7 +51,7 @@ func _ready():
 
 func _physics_process(delta):
 	process_input()
-	process_state(delta)
+	process_state()
 	set_limits()
 	process_collisions(delta)
 
@@ -69,7 +62,7 @@ func process_input():
 	do_input_actions()
 
 
-func process_state(delta):
+func process_state():
 	match state:
 		FLYING:
 			var inertia = 0.8
@@ -109,12 +102,6 @@ func process_state(delta):
 					in_air = true
 					in_air_start = OS.get_ticks_msec()
 			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
-		DASHING:
-			var inertia = 0.5
-			velocity.y = 0
-			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
-			if OS.get_ticks_msec() - dash_start > dash_time:
-				stop_dashing()
 
 
 func set_limits():
@@ -225,7 +212,9 @@ func do_input_actions():
 	last_button_a = button_a
 
 
-func set_state(new_state):
+func set_state(new_state, with_push=false):
+	if with_push:
+		state_stack.push_back(state)
 	state = new_state
 	change_animation()
 
@@ -273,22 +262,16 @@ func move_left():
 
 
 func move_sideway():
-	if state == DASHING:
-		stop_dashing()
 	change_animation()
 
 
 func stop_moving():
-	if state == DASHING:
-		stop_dashing()
 	speed.x = 0
 	change_animation()
 
 
 func move_up():
 	speed.y = -1
-	if state == DASHING:
-		stop_dashing()
 	if (last_action == MOVE_UP
 			and OS.get_ticks_msec() - last_action_time < 250):
 		fly()
@@ -330,32 +313,13 @@ func fly():
 
 func stop_flying():
 	if character_mode != CharacterMode.FLY:
-		if state == DASHING:
-			stop_dashing()
 		set_state(FALLING)
 		change_animation()
 
 
 func do_action_a():
-	if speed.x != 0:
-		dash()
+	pass
 
 
 func stop_action_a():
 	pass
-
-
-func dash():
-	if can_dash and OS.get_ticks_msec() - dash_end > dash_cooldown:
-		state_stack.push_back(state)
-		set_state(DASHING)
-		speed.x *= dash_multiplier
-		dash_start = OS.get_ticks_msec()
-		change_animation()
-
-
-func stop_dashing():
-	set_state(state_stack.pop_back())
-	speed.x = 1 * sign(speed.x)
-	dash_end = OS.get_ticks_msec()
-	change_animation()
