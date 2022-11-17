@@ -1,10 +1,11 @@
 extends MovingBody
 
 
-enum {DASHING = 1000}
+enum {DASHING = 1000, PUNCHING}
 
 
 export var can_dash = true
+export var punch_speed = 20
 export var dash_multiplier = 3
 export var dash_time = 200
 export var dash_cooldown = 500
@@ -15,6 +16,10 @@ var dash_end = 0
 
 func process_state():
 	match state:
+		PUNCHING:
+			var inertia = 0.5
+			velocity.y = 0
+			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
 		DASHING:
 			var inertia = 0.5
 			velocity.y = 0
@@ -25,10 +30,10 @@ func process_state():
 			.process_state()
 
 
-func move_sideway():
+func move_sideway(speed_x):
 	if state == DASHING:
 		stop_dashing()
-	.move_sideway()
+	.move_sideway(speed_x)
 
 
 func stop_moving():
@@ -57,16 +62,24 @@ func stop_flying():
 
 
 func do_action_a():
-	if speed.x != 0:
+	if speed.x == 0:
+		punch()
+	else:
 		dash()
+
+
+func punch():
+	if state == ON_FLOOR:
+		speed.x = 1 if face_right else -1
+		set_state(PUNCHING)
 
 
 func dash():
 	if (can_dash and state != DASHING
 			and OS.get_ticks_msec() - dash_end > dash_cooldown):
 		speed.x = sign(speed.x) * dash_multiplier
-		set_state(DASHING, true)
 		dash_start = OS.get_ticks_msec()
+		set_state(DASHING, true)
 		change_animation()
 
 

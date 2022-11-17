@@ -250,19 +250,19 @@ func change_animation():
 
 
 func move_right():
-	face_right = true
-	speed.x = 1
-	move_sideway()
+	move_sideway(1)
 
 
 func move_left():
-	face_right = false
-	speed.x = -1
-	move_sideway()
+	move_sideway(-1)
 
 
-func move_sideway():
-	change_animation()
+func move_sideway(speed_x):
+	if (state == FALLING or state == ON_FLOOR
+			or state == JUMPING or state == FLYING):
+		speed.x = speed_x
+		face_right = speed.x >= 0
+		change_animation()
 
 
 func stop_moving():
@@ -271,37 +271,45 @@ func stop_moving():
 
 
 func move_up():
-	speed.y = -1
-	if (last_action == MOVE_UP
-			and OS.get_ticks_msec() - last_action_time < 250):
-		fly()
-	elif state == FALLING or state == ON_FLOOR or state == JUMPING:
-		if num_jumps < max_jumps:
-			num_jumps += 1
-			velocity.y = -jump_speed
-			set_state(JUMPING)
-			change_animation()
+	if (state == FALLING or state == ON_FLOOR
+			or state == JUMPING or state == FLYING):
+		speed.y = -1
+		if state != FLYING:
+			if (last_action == MOVE_UP
+					and OS.get_ticks_msec() - last_action_time < 250):
+				fly()
+			elif num_jumps < max_jumps:
+				num_jumps += 1
+				velocity.y = -jump_speed
+				set_state(JUMPING)
+				change_animation()
 	last_action = MOVE_UP
 	last_action_time = OS.get_ticks_msec()
 
 
 func stop_moving_up():
-	speed.y = 0
-	if state == JUMPING:
-		velocity.y /= 2
+	if (state == FALLING or state == ON_FLOOR
+			or state == JUMPING or state == FLYING):
+		speed.y = 0
+		if state == JUMPING:
+			velocity.y /= 2
 
 
 func move_down():
-	speed.y = 1
-	if (last_action == MOVE_DOWN
-			and OS.get_ticks_msec() - last_action_time < 250):
-		stop_flying()
+	if (state == FALLING or state == ON_FLOOR
+			or state == JUMPING or state == FLYING):
+		speed.y = 1
+		if (last_action == MOVE_DOWN
+				and OS.get_ticks_msec() - last_action_time < 250):
+			stop_flying()
 	last_action = MOVE_DOWN
 	last_action_time = OS.get_ticks_msec()
 
 
 func stop_moving_down():
-	speed.y = 0
+	if (state == FALLING or state == ON_FLOOR
+			or state == JUMPING or state == FLYING):
+		speed.y = 0
 
 
 func fly():
