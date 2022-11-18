@@ -5,10 +5,10 @@ enum {DASHING = 1000, PUNCHING}
 
 
 export var can_dash = true
-export var punch_speed = 20
 export var dash_multiplier = 3
 export var dash_time = 200
 export var dash_cooldown = 500
+export var punch_speed = 20
 
 var dash_start = 0
 var dash_end = 0
@@ -23,7 +23,8 @@ func process_state():
 		DASHING:
 			var inertia = 0.5
 			velocity.y = 0
-			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+			var target_velocity = speed.x * movement_speed * dash_multiplier
+			velocity.x = lerp(target_velocity, velocity.x, inertia)
 			if OS.get_ticks_msec() - dash_start > dash_time:
 				stop_dashing()
 		_:
@@ -75,9 +76,7 @@ func punch():
 
 
 func dash():
-	if (can_dash and state != DASHING
-			and OS.get_ticks_msec() - dash_end > dash_cooldown):
-		speed.x = sign(speed.x) * dash_multiplier
+	if can_dash and OS.get_ticks_msec() - dash_end > dash_cooldown:
 		dash_start = OS.get_ticks_msec()
 		set_state(DASHING, true)
 		change_animation()
@@ -85,6 +84,5 @@ func dash():
 
 func stop_dashing():
 	set_state(state_stack.pop_back())
-	speed.x = 1 * sign(speed.x)
 	dash_end = OS.get_ticks_msec()
 	change_animation()
