@@ -18,6 +18,7 @@ export var movement_speed = 150
 export var jump_speed = 510
 export var max_jumps = 1
 
+
 # control
 var direction = Vector2.ZERO
 var button_a = false
@@ -39,6 +40,7 @@ var on_wall = false
 var last_action = NONE
 var last_action_time = 0
 var snap_pos: Vector2
+
 
 onready var has_animation = has_node("Animation")
 
