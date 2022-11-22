@@ -11,7 +11,6 @@ enum {FALLING, ON_FLOOR, JUMPING, FLYING}
 
 
 export(CharacterMode) var character_mode = CharacterMode.WALK_AND_FLY
-export var user_input = false
 export var max_speed = 700
 export var gravity = 25
 export var movement_speed = 150
@@ -59,9 +58,30 @@ func _physics_process(delta):
 
 
 func process_input():
-	if user_input:
-		get_user_input()
-	do_input_actions()
+	if direction.x > 0.5:
+		if last_direction.x <= 0.5:
+			move_right()
+	elif direction.x < -0.5:
+		if last_direction.x >= -0.5:
+			move_left()
+	elif last_direction.x < -0.5 or last_direction.x > 0.5:
+		stop_moving()
+	if direction.y < -0.5:
+		if last_direction.y >= -0.5:
+			move_up()
+	elif direction.y > 0.5:
+		if last_direction.y <= 0.5:
+			move_down()
+	elif last_direction.y < -0.5:
+		stop_moving_up()
+	elif last_direction.y > 0.5:
+		stop_moving_down()
+	if button_a and not last_button_a:
+		do_action_a()
+	elif not button_a and last_button_a:
+		stop_action_a()
+	last_direction = direction
+	last_button_a = button_a
 
 
 func process_state():
@@ -185,33 +205,6 @@ func get_kb_input_state():
 	elif Input.is_action_pressed("move_down") and last_direction.y > 0.5:
 		direction.y = 1
 	button_a = Input.is_action_pressed("button_a")
-
-
-func do_input_actions():
-	if direction.x > 0.5:
-		if last_direction.x <= 0.5:
-			move_right()
-	elif direction.x < -0.5:
-		if last_direction.x >= -0.5:
-			move_left()
-	elif last_direction.x < -0.5 or last_direction.x > 0.5:
-		stop_moving()
-	if direction.y < -0.5:
-		if last_direction.y >= -0.5:
-			move_up()
-	elif direction.y > 0.5:
-		if last_direction.y <= 0.5:
-			move_down()
-	elif last_direction.y < -0.5:
-		stop_moving_up()
-	elif last_direction.y > 0.5:
-		stop_moving_down()
-	if button_a and not last_button_a:
-		do_action_a()
-	elif not button_a and last_button_a:
-		stop_action_a()
-	last_direction = direction
-	last_button_a = button_a
 
 
 func set_state(new_state, with_push=false):
