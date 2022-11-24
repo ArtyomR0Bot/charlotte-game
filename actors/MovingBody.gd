@@ -58,23 +58,23 @@ func _physics_process(delta):
 
 
 func process_input():
-	if direction.x > 0.5:
-		if last_direction.x <= 0.5:
+	if direction.x > 0:
+		if last_direction.x <= 0:
 			move_right()
-	elif direction.x < -0.5:
-		if last_direction.x >= -0.5:
+	elif direction.x < 0:
+		if last_direction.x >= 0:
 			move_left()
-	elif last_direction.x < -0.5 or last_direction.x > 0.5:
+	elif last_direction.x < 0 or last_direction.x > 0:
 		stop_moving()
-	if direction.y < -0.5:
-		if last_direction.y >= -0.5:
+	if direction.y < 0:
+		if last_direction.y >= 0:
 			move_up()
-	elif direction.y > 0.5:
-		if last_direction.y <= 0.5:
+	elif direction.y > 0:
+		if last_direction.y <= 0:
 			move_down()
-	elif last_direction.y < -0.5:
+	elif last_direction.y < 0:
 		stop_moving_up()
-	elif last_direction.y > 0.5:
+	elif last_direction.y > 0:
 		stop_moving_down()
 	if button_a and not last_button_a:
 		do_action_a()
@@ -124,6 +124,13 @@ func process_state():
 					in_air = true
 					in_air_start = OS.get_ticks_msec()
 			velocity.x = lerp(speed.x * movement_speed, velocity.x, inertia)
+
+
+func set_state(new_state, with_push=false):
+	if with_push:
+		state_stack.push_back(state)
+	state = new_state
+	change_animation()
 
 
 func set_limits():
@@ -180,38 +187,6 @@ func process_collisions(delta):
 			on_ceiling = false
 	else:
 		snap_pos = Vector2.ZERO
-
-
-func get_user_input():
-	get_kb_input_state()
-
-
-func get_kb_input_state():
-	direction = Vector2.ZERO
-	if Input.is_action_just_pressed("move_right"):
-		direction.x = 1
-	elif Input.is_action_just_pressed("move_left"):
-		direction.x = -1
-	elif Input.is_action_pressed("move_right") and last_direction.x > 0.5:
-		direction.x = 1
-	elif Input.is_action_pressed("move_left") and last_direction.x < -0.5:
-		direction.x = -1
-	if Input.is_action_just_pressed("move_up"):
-		direction.y = -1
-	elif Input.is_action_just_pressed("move_down"):
-		direction.y = 1
-	elif Input.is_action_pressed("move_up") and last_direction.y < -0.5:
-		direction.y = -1
-	elif Input.is_action_pressed("move_down") and last_direction.y > 0.5:
-		direction.y = 1
-	button_a = Input.is_action_pressed("button_a")
-
-
-func set_state(new_state, with_push=false):
-	if with_push:
-		state_stack.push_back(state)
-	state = new_state
-	change_animation()
 
 
 func move_and_collide_ex(vel):

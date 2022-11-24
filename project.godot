@@ -10,18 +10,18 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "KinematicBody2D",
-"class": "Character",
-"language": "GDScript",
-"path": "res://actors/Character.gd"
-}, {
-"base": "KinematicBody2D",
 "class": "MovingBody",
 "language": "GDScript",
 "path": "res://actors/MovingBody.gd"
+}, {
+"base": "Node",
+"class": "Player",
+"language": "GDScript",
+"path": "res://levels/TestLevel3/Player.gd"
 } ]
 _global_script_class_icons={
-"Character": "",
-"MovingBody": ""
+"MovingBody": "",
+"Player": ""
 }
 
 [application]

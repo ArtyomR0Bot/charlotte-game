@@ -2,18 +2,23 @@ extends MovingBody
 
 
 const DASH_MULTIPLIER = 3
+const DASH_TIME = 200
+const DASH_COOLDOWN = 500
 const PUNCH_SPEED = 100
+const PUNCH_TIME = 200
 
 
 enum {DASHING = 1000}
 
 
-var punching = false
+var dash_start: int
+var dash_end: int
+var punching: bool
+var punch_start: int
 
 
-onready var dash_timer = $DashTimer
-onready var punch_timer = $PunchTimer
-onready var dash_cooldown_timer = $DashCooldownTimer
+func time_elapsed(start: int, timeout: int):
+	return OS.get_ticks_msec() - start >= timeout
 
 
 func process_state():
@@ -23,7 +28,7 @@ func process_state():
 			velocity.y = 0
 			var target_velocity = speed.x * movement_speed * DASH_MULTIPLIER
 			velocity.x = lerp(target_velocity, velocity.x, inertia)
-			if dash_timer.is_stopped():
+			if time_elapsed(dash_start, DASH_TIME):
 				stop_dashing()
 		_:
 			.process_state()
@@ -31,7 +36,7 @@ func process_state():
 		var inertia = 0.5
 		var dir = 1 if face_right else -1
 		velocity.x = lerp(PUNCH_SPEED * dir, velocity.x, inertia)
-		if punch_timer.is_stopped():
+		if time_elapsed(punch_start, PUNCH_TIME):
 			stop_punching()
 
 
@@ -78,22 +83,23 @@ func do_action_a():
 
 
 func dash():
-	if dash_cooldown_timer.is_stopped():
+	if time_elapsed(dash_end, DASH_COOLDOWN):
 		set_state(DASHING, true)
-		dash_timer.start()
+		dash_start = OS.get_ticks_msec()
 
 
 func stop_dashing():
 	if state == DASHING:
 		set_state(state_stack.pop_back())
-		dash_cooldown_timer.start()
+		dash_end = OS.get_ticks_msec()
 
 
 func punch():
-	if not punching and (state == ON_FLOOR or state == FALLING
+	if (state == ON_FLOOR or state == FALLING
 			or state == JUMPING or state == FLYING):
-		punching = true
-		punch_timer.start()
+		if not punching:
+			punching = true
+			punch_start = OS.get_ticks_msec()
 
 
 func stop_punching():

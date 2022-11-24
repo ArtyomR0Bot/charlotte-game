@@ -464,18 +464,3 @@ playing = true
 playback_process_mode = 0
 anims/RESET = SubResource( 75 )
 anims/fly = SubResource( 132 )
-
-[node name="DashTimer" type="Timer" parent="."]
-process_mode = 0
-wait_time = 0.2
-one_shot = true
-
-[node name="DashCooldownTimer" type="Timer" parent="."]
-process_mode = 0
-wait_time = 0.5
-one_shot = true
-
-[node name="PunchTimer" type="Timer" parent="."]
-process_mode = 0
-wait_time = 0.2
-one_shot = true
